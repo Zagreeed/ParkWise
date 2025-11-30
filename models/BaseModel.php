@@ -19,6 +19,12 @@ class BaseModel{
             $coloums = implode(', ', array_keys($filteredDatas));
             $fields =  ":" . implode(", :", array_keys($filteredDatas));
 
+            $sql = "INSERT INTO $this->table ($coloums) VALUES($fields)";
+            $request = $this->db->prepare($sql);
+            $request->execute($filteredDatas);
+
+            return $this->db->lastInserted();
+
         }catch(PDOException $e){
             error_log($e->getMessage());
             return false;
