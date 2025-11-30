@@ -1,4 +1,4 @@
 # ParkWise DATABASE ERD
 
 
-![Alt text](images/ERD.png)
+![ERD Diagram](images/ERD.png)
