@@ -2,9 +2,9 @@
 
 class User extends BaseModel{ 
 
-    private $table = "User"; 
-    private $primaryKey = "user_id"; 
-    private $fillable = ["username", "email", "phonenumber", "address"]; 
+    protected $table = "User"; 
+    protected $primaryKey = "user_id"; 
+    protected $fillable = ["username", "email", "phonenumber", "address"]; 
 
      public function getTotalUser(){
         try{

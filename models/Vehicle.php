@@ -2,8 +2,8 @@
 
 
 class Vehicle extends BaseModel{
-    private $table = "Vehicle"; 
-    private $primaryKey = "vehicle_id"; 
-    private $fillable = ["user_id", "plate_number", "vehicle_type", "brand"]; 
+    protected $table = "Vehicle"; 
+    protected $primaryKey = "vehicle_id"; 
+    protected $fillable = ["user_id", "plate_number", "vehicle_type", "brand"]; 
    
 }

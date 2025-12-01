@@ -9,10 +9,10 @@ class AdminController extends BaseController{
 
 
     public function __construct(){
-        $this->$bookingModel = $this->loadModel("Bookings");
-        $this->$parkingSlotModel = $this->loadModel("ParkingSlot");
-        $this->$paymentModel = $this->loadModel("Payments");
-        $this->$userModel = $this->loadModel("User");
+        $this->bookingModel = $this->loadModel("Bookings");
+        $this->parkingSlotModel = $this->loadModel("ParkingSlot");
+        $this->paymentModel = $this->loadModel("Payments");
+        $this->userModel = $this->loadModel("User");
     }
 
 
@@ -20,7 +20,7 @@ class AdminController extends BaseController{
 
         $totalBookings = $this->bookingModel->getTotalBookings();
         $availableSlot = $this->parkingSlotModel->getAvailableSlot();
-        $totalRevenue = $this->$paymentModel->getRevenue();
+        $totalRevenue = $this->paymentModel->getRevenue();
         $totalUser = $this->userModel->getTotalUser();
 
 

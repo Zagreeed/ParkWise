@@ -1,9 +1,9 @@
 <?php
 
 class Payments extends BaseModel{
-    private $table = "Payments"; 
-    private $primaryKey = "slot_id"; 
-    private $fillable = ["booking_id", "amount", "payment_method", "payment_status"]; 
+    protected $table = "Payments"; 
+    protected $primaryKey = "payment_id"; 
+    protected $fillable = ["booking_id", "amount", "payment_method", "payment_status"]; 
 
       public function getRevenue(){
         try{

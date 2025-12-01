@@ -10,7 +10,7 @@
 <?php require_once("./views/components/NavBar.php")?>
 
 /// MAIN CONTENT
-<?php require_once("./views/admin/$filePath")?>
+<?php require_once("./views/admin/$fileName" . ".php")?>
 
 
 /// FOOTER???

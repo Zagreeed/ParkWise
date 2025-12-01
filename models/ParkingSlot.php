@@ -1,9 +1,9 @@
 <?php
 
 class ParkingSlot extends BaseModel{
-    private $table = "ParkingSlot"; 
-    private $primaryKey = "slot_id"; 
-    private $fillable = ["slot_number", "location", "status"]; 
+    protected $table = "ParkingSlot"; 
+    protected $primaryKey = "slot_id"; 
+    protected $fillable = ["slot_number", "location", "status"]; 
 
     public function getAvailableSlot(){
         try{

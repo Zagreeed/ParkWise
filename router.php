@@ -9,16 +9,31 @@ function call($controller, $action){
 
     switch($controller){
         case "AdminController":
-            $controller = new AdminController();
-        break;
+            $controllerInstance = new AdminController();
+            break;
+        case "Home":
+            $controllerInstance = new HomeController();
+            break;
+        
     }
 
 
-    $controller->{$action}();
+    $controllerInstance->{$action}();
 
 }
 
 
 $routes = [
-    "AdminController" => ["getDashBoard", "getParkingSlots", "getPayments", "getUsers"],
+    "Home" => ["index"],
+    "AdminController" => ["getDashBoardData", "getParkingSlotsPage", "getBookingsPage", "getPaymentsPage",  "getUserContactPage"],
 ];
+
+
+
+if(array_key_exists($controller, $routes)){
+    if(in_array($action, $routes[$controller])){
+        call($controller, $action);
+    }
+}else{
+    call("Home", "index");
+}
