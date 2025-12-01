@@ -35,5 +35,5 @@ if(array_key_exists($controller, $routes)){
         call($controller, $action);
     }
 }else{
-    call("Home", "index");
+    call("AdminController", "getDashBoardData");
 }

@@ -14,7 +14,7 @@ class ParkingSlot extends BaseModel{
 
             $data = $request->fetch(PDO::FETCH_ASSOC);
 
-            return $data;
+            return $data["available_slot"] ?? 0;
 
         }catch(PDOException $e){
             error_log($e->getMessage());

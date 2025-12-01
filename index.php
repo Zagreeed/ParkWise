@@ -1,6 +1,6 @@
 
 <?php
-
+define('BASE_URL', "/ParkWise/");
 
 require_once("./dbConnection.php");
 
@@ -12,8 +12,8 @@ if(isset($_GET["controller"]) && isset($_GET["action"])){
     $controller = $_GET["controller"];
     $action = $_GET["action"];
 }else{
-    $controller = "Home";
-    $action = "index";
+    $controller = "AdminController";
+    $action = "getDashBoardData";
 }
 
 require_once("./router.php");

@@ -1,0 +1,225 @@
+/* GENERAL */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #E7F3ED;
+    display: flex;
+}
+
+/* LOGIN */
+.login-container {
+    margin: 100px auto;
+    width: 300px;
+    height: 450px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(140, 161, 138, 0.15);
+}
+
+.login-logo1 {
+    width: 130px;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+.login-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #4B514C;
+}
+
+.label {
+    font-size: 14px;
+    margin-top: 10px;
+    display: block;
+    color: #413A3A;
+}
+
+input, select {
+    width: 90%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 6px;
+    border: 1px solid #bbb;
+}
+
+.btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    background: #14452F;
+    color: white;
+    border: none;
+    border-radius: 6px;
+}
+
+.error {
+    color: red;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    background: #14452F;
+    color: white;
+    padding: 20px;
+    position: fixed;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar ul {
+    padding: 0;
+    list-style: none;
+}
+
+/* Sidebar items with icons */
+.sidebar ul li {
+    padding: 14px;
+    margin: 5px 0;
+    cursor: pointer;
+    border-radius: 5px;
+
+    /* 🔥 Added for icon alignment */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+}
+
+/* Icons styling */
+.sidebar ul li i {
+    font-size: 18px;
+    width: 22px; /* keeps icons aligned */
+    text-align: center;
+}
+
+/* Hover + Active effect */
+.sidebar ul li:hover,
+.sidebar ul li.active {
+    background: #27ae60;
+    color: #ffffff;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    margin-left: 260px;
+    padding: 25px;
+    width: 100%;
+}
+
+.section { display: none; }
+.visible { display: block; }
+
+/* TABLE */
+.data-table {
+    width: 100%;
+    background: white;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.data-table th, .data-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.status {
+    padding: 5px 8px;
+    border-radius: 4px;
+    color: white;
+}
+.status.active { background: #27ae60; }
+.status.completed { background: #2980b9; }
+.status.pending { background: #f39c12; }
+
+/* CARDS */
+/* Top Dashboard Cards */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;           /* spacing between cards */
+    margin-bottom: 30px; /* space below the cards */
+}
+
+.card {
+    background: linear-gradient(to bottom, #d8f5e4, #86c592); 
+    padding: 25px;        /* slightly more padding for uniform size */
+    border-radius: 12px;  /* rounded corners */
+    box-shadow: 5px 6px 14px rgba(0,0,0,0.08); /* soft shadow */
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #242b26;
+    min-height: 100px;    /* ensures all cards same height */
+}
+
+
+/* ANALYTICS ROW */
+.analytics-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin-top: 30px;
+}
+/* Prevent canvas stretching and blurring */
+.chart-card canvas {
+    display: block;
+    width: 100% !important;   /* full width of parent */
+    height: 200px !important; /* fixed height */
+    image-rendering: auto;    /* ensures crisp rendering */
+    margin-top: 10px;         /* small spacing below title */
+}
+
+
+/* Chart card title at top */
+.chart-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;      /* spacing between title and chart */
+    color: #242b26;
+    text-align: left;         /* title aligned left inside card */
+}
+
+/* Optional: Limit card width */
+.chart-card {
+    max-width: 450px;  /* prevents card from stretching too much */
+    margin: 0 auto;    /* center card in grid */
+}
+
+/* Chart card layout */
+.chart-card {
+    display: block;            /* keep title on top */
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 5px 4px 15px rgba(0,0,0,0.1);
+    max-width: 450px;
+    margin: 0 auto;           /* center card in grid */
+}
+
+.chart-card.donut-chart canvas {
+    width: auto !important;   /* maintain original width */
+    height: 200px !important;
+}
+
+.chart-card.donut-chart canvas {
+    width: 350px !important;   /* matches HTML width */
+    height: 270px !important;  /* matches HTML height */
+    margin-top: 10px;
+}
+/* Keep the donut chart itself crisp and unchanged */
+.chart-card.donut-chart canvas {
+    width: auto !important;    /* maintain original chart width */
+    height: 200px !important;  /* fixed height */
+    display: block;
+    margin: 0 auto;
+    image-rendering: auto;     /* prevents blurring */
+}

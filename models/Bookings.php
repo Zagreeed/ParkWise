@@ -16,7 +16,7 @@ class Bookings extends BaseModel{
 
             $data = $request->fetch(PDO::FETCH_ASSOC);
 
-            return $data;
+            return $data["total_bookings"] ?? 0;
 
         }catch(PDOException $e){
             error_log($e->getMessage());
