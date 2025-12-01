@@ -1,4 +1,4 @@
- <section id="payments" class="section">
+ <section id="payments" class="section visible">
         <h1>Payments</h1>
         <table class="data-table">
             <thead>

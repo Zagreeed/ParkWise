@@ -11,9 +11,10 @@ class BaseController{
     }
 
 
-    public function  renderView($folderPath, $fileName, $datas = NULL){
+    public function  renderView($folderPath, $fileName, $datas = NULL, $location){
 
         $content = $datas;
+
 
         require_once("./views/layout.php");
 

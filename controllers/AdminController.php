@@ -32,7 +32,7 @@ class AdminController extends BaseController{
         ];
 
 
-        $this->renderView("admin", "dashBoard", $datas);
+        $this->renderView("admin", "dashBoard", $datas, "dashBoard");
 
 
         
@@ -42,25 +42,25 @@ class AdminController extends BaseController{
     public function getParkingSlotsPage(){
         $datas = $this->parkingSlotModel->getAll();
 
-        $this->renderView("admin", "parkingSlotPage", $datas);
+        $this->renderView("admin", "parkingSlotPage", $datas, "slotPage");
     }
 
     public function getBookingsPage(){
        $datas = $this->bookingModel->getBookingsDetail();
 
-       $this->renderView("admin", "BookingsPage", $datas);
+       $this->renderView("admin", "BookingsPage", $datas, "bookingsPages");
     }
 
     public function getPaymentsPage(){
         $datas = $this->paymentModel->getAll();
 
-        $this->renderView("admin","PaymentsPage", $datas);
+        $this->renderView("admin","PaymentsPage", $datas, "paymentsPage");
     }
 
     public function getUserContactPage(){
         $datas = $this->userModel->getAll();
 
-        $this->renderView("admin", "UserDetailsPage", $datas);
+        $this->renderView("admin", "UserDetailsPage", $datas, "userPages");
     }
 
 

@@ -223,3 +223,40 @@ input, select {
     margin: 0 auto;
     image-rendering: auto;     /* prevents blurring */
 }
+
+
+/* Remove default link styles */
+.sidebar ul li a {
+    color: inherit;              /* inherit color from parent */
+    text-decoration: none;       /* remove underline */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 0;                  /* remove default padding */
+    margin: 0;                   /* remove default margin */
+    background: none;            /* remove background */
+    border: none;                /* remove border */
+    cursor: pointer;             /* keep pointer cursor */
+}
+
+/* Remove ALL default anchor tag styles globally */
+a {
+    color: inherit;
+    text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    cursor: pointer;
+}
+
+a:visited,
+a:hover,
+a:active,
+a:focus {
+    color: inherit;
+    text-decoration: none;
+    outline: none;
+}

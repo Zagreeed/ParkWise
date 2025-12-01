@@ -1,4 +1,4 @@
- <section id="users" class="section">
+ <section id="users" class="section visible">
         <h1>Users</h1>
         <table class="data-table">
             <thead>

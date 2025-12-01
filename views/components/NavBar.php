@@ -3,27 +3,52 @@
     <h2>Admin Panel</h2>
 
     <ul>
-        <li onclick="showSection('dashboard')" class="active">
-            <i class="fa-solid fa-chart-line"></i> Dashboard
-        </li>
+        <a href="?controller=AdminController&action=getDashBoardData">
+            <li  class="<?php  echo $location == "dashBoard" ? "active" : "" ?>">
+                    
+                        <i class="fa-solid fa-chart-line"></i> Dashboard
+                        
+            </li>
+        
+        </a>
 
-        <li onclick="showSection('slots')">
-            <i class="fa-solid fa-square-parking"></i> Parking Slots
-        </li>
+        <a href="?controller=AdminController&action=getParkingSlotsPage">
+                <li  class="<?php echo $location == "slotPage" ? "active" : "" ?>">
+                
 
-        <li onclick="showSection('bookings')">
-            <i class="fa-solid fa-calendar-check"></i> Bookings
-        </li>
+                    <i class="fa-solid fa-square-parking"></i> Parking Slots
+                    
+                </li>
+        </a>
+        
+        <a href="?controller=AdminController&action=getBookingsPage">
+        
+                    <li  class="<?php echo $location == "bookingsPages" ? "active" : "" ?>">
+                
+                        <i class="fa-solid fa-calendar-check"></i> Bookings
+                        
+                    </li>
+            </a>
+            
+            <a href="?controller=AdminController&action=getUserContactPage">
+                        <li  class="<?php echo $location == "userPages" ? "active" : "" ?>">
 
-        <li onclick="showSection('users')">
-            <i class="fa-solid fa-users"></i> Users
-        </li>
 
-        <li onclick="showSection('payments')">
-            <i class="fa-solid fa-credit-card"></i> Payments
-        </li>
+                            <i class="fa-solid fa-users"></i> Users
+                        
+                        </li>
+            </a>
 
-        <li onclick="logout()">
+            <a href="?controller=AdminController&action=getPaymentsPage">
+                        <li class="<?php echo $location == "paymentsPage" ? "active" : "" ?>">
+                    
+
+                             <i class="fa-solid fa-credit-card"></i> Payments
+                        </li>
+            </a>
+              
+
+        <li >
             <i class="fa-solid fa-right-from-bracket"></i> Logout
         </li>
     </ul>
