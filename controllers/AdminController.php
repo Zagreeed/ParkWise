@@ -58,7 +58,7 @@ class AdminController extends BaseController{
     }
 
     public function getUserContactPage(){
-        $datas = $this->userModel->getAll();
+        $datas = $this->userModel->getAllUser();
 
         $this->renderView("admin", "UserDetailsPage", $datas, "userPages");
     }

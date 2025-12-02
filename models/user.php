@@ -22,5 +22,22 @@ class User extends BaseModel{
             return false;
         }
     }
+
+      public function getAllUser(){
+        try{
+
+            $sql = "SELECT * FROM {$this->table} WHERE role = 'user'";
+
+            $request = $this->db->query($sql);
+
+            $result = $request->fetchAll(PDO::FETCH_ASSOC);
+
+            return $result;
+
+        }catch(PDOException $e){
+            error_log($e->getMessage());
+            return false;
+        }
+    }
    
 }

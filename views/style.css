@@ -124,6 +124,7 @@ input, select {
     background: white;
     border-collapse: collapse;
     margin-top: 20px;
+    text-align: center;
 }
 
 .data-table th, .data-table td {

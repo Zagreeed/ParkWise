@@ -12,6 +12,20 @@
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody id="bookingsTable"></tbody>
+            <tbody id="bookingsTable">
+             
+                 <?php foreach($content as $data):?>
+                    <tr>
+                        <td><?= $data["booking_id"]?></td>
+                        <td><?= $data["username"]?></td>
+                        <td><?= $data["vehicle"]?></td>
+                        <td><?= $data["slot"]?></td>
+                        <td><?= $data["start_time"]?></td>
+                        <td><?= $data["end_time"]?></td>
+                        <td class="status <?php  echo $data["status"]?>"><?= $data["status"]?></td>
+                      
+                    </tr>
+                <?php endforeach;?>
+            </tbody>
         </table>
     </section>
