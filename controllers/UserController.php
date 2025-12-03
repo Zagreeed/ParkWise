@@ -17,7 +17,7 @@ class UserController extends BaseController{
     }
 
 
-    public function getLoginPage(){
+    public function showLoginPage(){
         $this->renderView("user", "userDashBoard");
     }
 
@@ -35,13 +35,13 @@ class UserController extends BaseController{
 
         if(empty($datas["email"])){
             $_SESSION["errors"] = "Email is required";
-            $this->getLoginPage();
+            $this->showLoginPage();
             exit();
         }
 
         if(empty($datas["password"])){
             $_SESSION["errors"] = "Password is required";
-            $this->getLoginPage();
+            $this->showLoginPage();
             exit();
         }
 
@@ -50,14 +50,14 @@ class UserController extends BaseController{
 
         if(!$user){
             $_SESSION["errors"] = "User is not Found";
-            $this->getLoginPage();
+            $this->showLoginPage();
             exit();
         }
 
 
         if($user["passsword"] != $datas["password"]){
              $_SESSION["errors"] = "Password is incorrect";
-            $this->getLoginPage();
+            $this->showLoginPage();
             exit();
         }
 
