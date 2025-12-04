@@ -11,12 +11,12 @@ class BaseController{
     }
 
 
-    public function  renderView($folderPath, $fileName, $datas = NULL, $location){
+    public function  renderView($folderPath, $fileName, $datas = NULL, $location = NULL){
 
         $content = $datas;
 
 
-        require_once("./views/layout.php");
+        require_once("./views/uniLayout.php");
 
     }
 }

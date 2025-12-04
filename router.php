@@ -11,6 +11,9 @@ function call($controller, $action){
         case "AdminController":
             $controllerInstance = new AdminController();
             break;
+        case "UserController":
+             $controllerInstance = new UserController();
+             break;
         case "Home":
             $controllerInstance = new HomeController();
             break;
@@ -25,7 +28,7 @@ function call($controller, $action){
 
 $routes = [
     "Home" => ["index"],
-    "UserController" => ["getLoginPage", "login", "showDashBoard", "showSignUpPage", "signUp", "showAddVehichelPage", "addVehicle"],
+    "UserController" => ["getLoginPage", "login", "showDashBoard", "showSignUpPage", "signUp", "showAddVehichelPage", "addVehicle", "showMyVehiclePage", "showBookingsPage", "showActivityHistoryPage", "showProfilePage"],
     "AdminController" => ["getDashBoardData", "getParkingSlotsPage", "getBookingsPage", "getPaymentsPage",  "getUserContactPage"],
 ];
 
@@ -36,5 +39,5 @@ if(array_key_exists($controller, $routes)){
         call($controller, $action);
     }
 }else{
-    call("AdminController", "getDashBoardData");
+    call("UserController", "showDashBoard");
 }
