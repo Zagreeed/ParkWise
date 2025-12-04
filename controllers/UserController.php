@@ -18,7 +18,13 @@ class UserController extends BaseController{
 
 
     public function showLoginPage(){
-        $this->renderView("user", "userDashBoard");
+
+        if(isset($_SESSION["userId"])){
+            $this->showDashBoard();
+            exit();
+        }
+
+        $this->renderView("user", "loginPage");
     }
 
 
@@ -56,26 +62,38 @@ class UserController extends BaseController{
 
 
         if($user["passsword"] != $datas["password"]){
-             $_SESSION["errors"] = "Password is incorrect";
+            $_SESSION["errors"] = "Password is incorrect";
             $this->showLoginPage();
             exit();
         }
 
 
         /// REDIRECT USER TO THE USE DASHBOARD WITH ITS DASHBOARD DATA
+        $_SESSION["userId"] = $user["id"];
         $this->showDashBoard($user["id"]);
-
-
 
 
     }
 
 
     public function showDashBoard($userId){
+        if(!isset($_SESSION["userId"])){
+            $this->showLoginPage();
+            exit();
+        }
+
+
+        /// QUERY ALL THE DATA NEEDED FOR THE DASH-BOARD
 
     }
 
     public function showSignUpPage(){
+        
+        if(isset($_SESSION["userId"])){
+            $this->showDashBoard();
+            exit();
+        }
+
         $this->renderView("user", "signUpPage");
     }
 
@@ -112,19 +130,24 @@ class UserController extends BaseController{
         $userId = $this->userModel->create($datas);
         
         if(!$userId){
-            $_SESSION["errors"] = "Something went wrong while creating the user please check signUp controller -ps dev :>";
+            $_SESSION["errors"] = "Something went wrong while creating the user please check the 'signUp' controller -ps dev GALAN :>";
             $this->showSignUpPage();
             exit();
         }
         
         
-        $_SESSION["userId"] = $userId;
         /// REDIRRECT TO SHOW THE ADD/CREATE VEHICHLE PAGE
+        $_SESSION["userId"] = $userId;
         $this->showAddVehichelPage();
     }
 
 
     public function showAddVehichelPage(){
+        if(!isset($_SESSION["userId"])){
+            $_SESSION["errors"] = "Something went wrong while redirecting to addVechilePage check 'showAddVehichelPage' -ps dev GALAN";
+            $this->showLoginPage();
+            exit();
+        }
         $this->renderView("user", "addVechilePage");
     }
 
@@ -145,6 +168,8 @@ class UserController extends BaseController{
         ];
 
 
+        $errors = [];
+
         foreach($datas as $key => $value){
             if(empty($value)){
                 $errors[] = "$key" . " is required";
@@ -160,7 +185,7 @@ class UserController extends BaseController{
         $data = $this->vehicleModel->create($datas);
 
         if(!$data){
-            $_SESSION["errors"] = "Something very bad haappen while adding a vehicle!";
+            $_SESSION["errors"] = "Something very bad haappen while adding a vehicle! check the 'addVehicle' controller -ps dev GALAN";
             $this->showAddVehichelPage();
             exit();    
         };
