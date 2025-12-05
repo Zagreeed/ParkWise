@@ -89,7 +89,6 @@ class UserController extends BaseController{
         
     }
 
-
     public function showDashBoard(){
 
         ///NEED THE USERID
@@ -197,7 +196,7 @@ class UserController extends BaseController{
             exit();
         }
 
-        $this->renderView("user", "signUpPage");
+        $this->renderView("login", "signUpPage");
     }
 
 
@@ -241,8 +240,18 @@ class UserController extends BaseController{
         
         /// REDIRRECT TO SHOW THE ADD/CREATE VEHICHLE PAGE
         $_SESSION["userId"] = $userId;
-        $this->showAddVehichelPage();
-    }
+
+        /// LETS DO THIS WHEN THERES A UI FOR THIS TEMPORARY LETS REDIRECT THE USER TO THE DASHBOARD
+        // $this->showAddVehichelPage();
+
+
+        $this->showDashBoard();
+
+        echo "NAAA TA DIRRRRR";
+
+        exit();
+
+        }
 
 
     public function showAddVehichelPage(){

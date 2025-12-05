@@ -52,7 +52,7 @@
             </form>
 
             <div class="login-footer">
-                <p>Don't have an account? <a href="#" class="signup-link">Sign up</a></p>
+                <p>Don't have an account? <a href="?controller=UserController&action=showSignUpPage" class="signup-link">Sign up</a></p>
             </div>
         </div>
 
