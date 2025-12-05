@@ -212,7 +212,7 @@ class UserController extends BaseController{
             "phonenumber" => htmlspecialchars(strip_tags(trim($_POST['phonenumber'] ?? '')), ENT_QUOTES, 'UTF-8'),
             "role" => htmlspecialchars(strip_tags(trim($_POST['role'] ?? '')), ENT_QUOTES, 'UTF-8'),
             "email" => htmlspecialchars(strip_tags(trim($_POST['email'] ?? '')), ENT_QUOTES, 'UTF-8'),
-            "password" => htmlspecialchars(strip_tags(trim($_POST['passsword'] ?? '')), ENT_QUOTES, 'UTF-8'),
+            "password" => htmlspecialchars(strip_tags(trim($_POST['password'] ?? '')), ENT_QUOTES, 'UTF-8'),
         ];
 
         $errors = [];
@@ -247,7 +247,6 @@ class UserController extends BaseController{
 
         $this->showDashBoard();
 
-        echo "NAAA TA DIRRRRR";
 
         exit();
 

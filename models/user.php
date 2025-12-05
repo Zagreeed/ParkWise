@@ -4,7 +4,7 @@ class User extends BaseModel{
 
     protected $table = "User"; 
     protected $primaryKey = "user_id"; 
-    protected $fillable = ["username", "email", "phonenumber", "address"]; 
+    protected $fillable = ["username", "email", "phonenumber", "address", "password", "role"]; 
 
      public function getTotalUser(){
         try{
