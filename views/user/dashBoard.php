@@ -56,7 +56,7 @@
                 </div>
 
                 <div class="card">
-                    <h2>🕐 Recent Activity</h2>
+                    <h2>🕐 Recent Bookings</h2>
 
                     <?php foreach($content["activityHistory"] as $activity):?>
                             

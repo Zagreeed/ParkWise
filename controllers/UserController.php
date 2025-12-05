@@ -24,7 +24,7 @@ class UserController extends BaseController{
             exit();
         }
 
-        $this->renderView("user", "loginPage");
+        $this->renderView("login", "loginPage");
     }
 
 
@@ -36,7 +36,7 @@ class UserController extends BaseController{
 
         $datas = [
             "email" => htmlspecialchars(strip_tags(trim($_POST['email'] ?? '')), ENT_QUOTES, 'UTF-8'),
-            "password" => htmlspecialchars(strip_tags(trim($_POST['passsword'] ?? '')), ENT_QUOTES, 'UTF-8'),
+            "password" => htmlspecialchars(strip_tags(trim($_POST['password'] ?? '')), ENT_QUOTES, 'UTF-8'),
         ];
 
         if(empty($datas["email"])){
@@ -52,7 +52,7 @@ class UserController extends BaseController{
         }
 
 
-        $user = $this->userModel->find($datas["email"]);
+        $user = $this->userModel->findUserByEmail($datas["email"]);
 
         if(!$user){
             $_SESSION["errors"] = "User is not Found";
@@ -61,7 +61,7 @@ class UserController extends BaseController{
         }
 
 
-        if($user["passsword"] != $datas["password"]){
+        if($user["password"] != $datas["password"]){
             $_SESSION["errors"] = "Password is incorrect";
             $this->showLoginPage();
             exit();
@@ -69,10 +69,24 @@ class UserController extends BaseController{
 
 
         /// REDIRECT USER TO THE USE DASHBOARD WITH ITS DASHBOARD DATA
-        $_SESSION["userId"] = $user["id"];
+        $_SESSION["userId"] = $user["user_id"];
         $this->showDashBoard();
 
 
+    }
+
+    public function logout(){
+
+        if($_SERVER["REQUEST_METHOD"] != "POST"){
+            $this->renderView("error", "errorPage");
+            exit();
+        }
+
+        $_SESSION = [];
+        session_destroy();
+
+        $this->showLoginPage();
+        
     }
 
 
@@ -120,6 +134,11 @@ class UserController extends BaseController{
 
     public function showMyVehiclePage(){
 
+        
+        if(!isset($_SESSION["userId"])){
+            $this->showLoginPage();
+            exit();
+        }
 
         $datas = $this->vehicleModel->getUserVehicles($_SESSION["userId"]);
 
@@ -129,6 +148,13 @@ class UserController extends BaseController{
 
     public function showBookingsPage(){
 
+        
+        if(!isset($_SESSION["userId"])){
+            $this->showLoginPage();
+            exit();
+        }
+
+
         $datas = $this->parkingSlotModel->getAll();
 
         $this->renderView("user", "bookParkingPage", $datas, "bookParkingPage");
@@ -136,11 +162,27 @@ class UserController extends BaseController{
     }
 
     public function showActivityHistoryPage(){{
-        $this->renderView("user", "activityHistoryPage", NULL, "activityHistoryPage");
+
+        
+        if(!isset($_SESSION["userId"])){
+            $this->showLoginPage();
+            exit();
+        }
+        
+        $datas = $this->userModel->getUserAllActivity($_SESSION["userId"], 20);
+
+        $this->renderView("user", "activityHistoryPage", $datas, "activityHistoryPage");
 
     }}
 
     public function showProfilePage(){
+
+        
+        if(!isset($_SESSION["userId"])){
+            $this->showLoginPage();
+            exit();
+        }
+
         
         $data = $this->userModel->find($_SESSION["userId"]);
 

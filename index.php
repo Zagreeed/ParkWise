@@ -4,8 +4,6 @@
 session_start();
 
 
-$_SESSION["userId"] = 7;
-
 define('BASE_URL', "/ParkWise/");
 
 require_once("./dbConnection.php");
@@ -19,7 +17,7 @@ if(isset($_GET["controller"]) && isset($_GET["action"])){
     $action = $_GET["action"];
 }else{
     $controller = "UserController";
-    $action = "showDashBoard";
+    $action = "showLoginPage";
 }
 
 require_once("./router.php");

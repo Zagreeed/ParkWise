@@ -21,8 +21,10 @@
                     <img src="<?php echo BASE_URL?>views/static/Images/profile-icon.png" alt="Profile" class="menu-icon">
                     <span>Profile</span>
                 </a>
-                <a id="logout" href="#">
-                    <img src="<?php echo BASE_URL?>views/static/Images/profile-icon.png" alt="Logout" class="menu-icon">
-                    <span>Logout</span>
-                </a>
+                <form action="?controller=UserController&action=logout" method="post">
+                    <button type="submit" id="logout">
+                            <img src="<?php echo BASE_URL?>views/static/Images/profile-icon.png" alt="Logout" class="menu-icon">
+                            <span>Logout</span>
+                    </button>
+                </form>
             </nav>

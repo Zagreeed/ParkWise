@@ -81,7 +81,7 @@ class Bookings extends BaseModel{
         try{
 
             $sql = "SELECT 
-                        COALESCE(
+                        ROUND(
                             SUM(
                                 (julianday(b.end_time) - julianday(b.start_time)) * 24
                             ), 
