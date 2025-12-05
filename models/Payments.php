@@ -21,4 +21,33 @@ class Payments extends BaseModel{
             return false;
         }
     }
+
+
+    public function getTotalSpentForAMonth($userId){
+        try{
+
+            $sql = "SELECT 
+                        SUM(p.amount) AS total_spent
+                    FROM 
+                        Payments p
+                    INNER JOIN 
+                        Bookings b ON p.booking_id = b.booking_id
+                    WHERE 
+                        b.user_id = :userId
+                        AND p.payment_status = 'paid'
+                        AND strftime('%Y-%m', p.payment_date) = strftime('%Y-%m', 'now')";
+
+            $request = $this->db->prepare($sql);
+            $request->execute(["userId" => $userId]);
+
+            $data = $request->fetch(PDO::FETCH_ASSOC);
+
+             return empty($data) || $data['total_spent'] === null ? 0 : $data['total_spent'];
+
+        }catch(PDOException $e){
+            error_log($e->getMessage());
+            return false;
+        }
+
+    }
 }

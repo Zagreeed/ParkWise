@@ -21,4 +21,22 @@ class ParkingSlot extends BaseModel{
             return false;
         }
     }
+
+    public function getAvailableSlotDetail(){
+        try{
+
+            $sql = "SELECT * FROM {$this->table} WHERE status = 'available'";
+
+            $request = $this->db->prepare($sql);
+            $request->execute();
+
+            $datas = $request->fetchAll(PDO::FETCH_ASSOC);
+
+            return $datas ?: [];
+
+        }catch(PDOException $e){
+            error_log($e->getMessage());
+            return [];
+        }
+    }
 }

@@ -3,6 +3,9 @@
 
 session_start();
 
+
+$_SESSION["userId"] = 7;
+
 define('BASE_URL', "/ParkWise/");
 
 require_once("./dbConnection.php");
