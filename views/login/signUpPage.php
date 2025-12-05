@@ -11,7 +11,7 @@
     <div class="signup-container">
         <div class="signup-left">
 
-        <?php echo $_SESSION["errors"]?>
+
 
             <div class="signup-logo">Park<span>Wise</span></div>
             <p class="signup-tagline">Smart parking solutions for modern cities</p>

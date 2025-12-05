@@ -14,7 +14,7 @@ function call($controller, $action){
         case "UserController":
              $controllerInstance = new UserController();
              break;
-        case "Home":
+        case "HomeController":
             $controllerInstance = new HomeController();
             break;
         
@@ -27,7 +27,7 @@ function call($controller, $action){
 
 
 $routes = [
-    "Home" => ["index"],
+    "HomeController" => ["homePage"],
     "UserController" => ["showLoginPage", "login", "signUp", "logout", "showDashBoard", "showSignUpPage", "signUp", "showAddVehichelPage", "addVehicle", "showMyVehiclePage", "showBookingsPage", "showActivityHistoryPage", "showProfilePage", "updateProfile"],
     "AdminController" => ["getDashBoardData", "getParkingSlotsPage", "getBookingsPage", "getPaymentsPage",  "getUserContactPage"],
 ];
