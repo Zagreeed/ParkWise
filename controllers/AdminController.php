@@ -80,6 +80,8 @@ class AdminController extends BaseController{
         
       
         $booking = $this->bookingModel->find($id);
+        $paymentDetails = $this->paymentModel->getPaymentByBookingId($id);
+    
         
         if(!$booking){
             $this->renderView("error", "errorPage");
@@ -104,7 +106,9 @@ class AdminController extends BaseController{
   
         if($newStatus === "active" && isset($booking['slot_id'])){
             $slotData = ["status" => "occupied"];
+            $paymentData = ["payment_status" => "paid"];
             $this->parkingSlotModel->update($booking['slot_id'], $slotData);
+            $this->paymentModel->update($paymentDetails["payment_id"], $paymentData);
         }
 
         

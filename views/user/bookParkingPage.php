@@ -1,5 +1,7 @@
     <div class="main-display">
 
+
+   
             <div class="header">
                 <div class="welcome">
                     <h1>Book Parking</h1>
@@ -12,17 +14,18 @@
                     <div class="parking-grid">
 
                         <?php foreach($content as $slot):?>
-                            <div class="parking-spot <?= $slot["status"]?>" onclick="selectSpot('A3')">
+                            <form method="post" action="?controller=UserController&action=showBookingDetailsPage" class="parking-spot <?= $slot["status"]?>" onclick="this.submit()">
+                                <input type="hidden" name="slot_id" value="<?= $slot["slot_id"]?>">
                                 <div class="spot-number"><?= $slot["slot_number"]?></div>
                                 <div class="spot-status"><?= $slot["status"]?></div>
-                            </div>
+                            </form>
                         <?php endforeach;?>
 
                         
                     </div>
                 </div>
             </div>
-            <!-- You can open the modal using ID.showModal() method -->
+         
             <dialog id="my_modal_3" class="modal">
             <div class="modal-box">
                 <form method="dialog">

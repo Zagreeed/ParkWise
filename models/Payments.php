@@ -50,4 +50,24 @@ class Payments extends BaseModel{
         }
 
     }
+
+
+    public function getPaymentByBookingId($id){
+        try{
+
+            $sql = "SELECT * FROM {$this->table} WHERE booking_id = :id";
+
+            $request = $this->db->prepare($sql);
+            $request->execute(["id" => $id]);
+
+            $data = $request->fetch(PDO::FETCH_ASSOC);
+
+
+            return !empty($data) ? $data : false;
+
+        }catch(PDOException $e){
+            error_log($e->getMessage());
+            return false;
+        }
+    }
 }

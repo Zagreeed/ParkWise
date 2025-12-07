@@ -395,6 +395,179 @@ class UserController extends BaseController{
 
     }
 
+    public function showBookingDetailsPage(){
+        if(!isset($_SESSION["userId"])){
+            $this->showLoginPage();
+            exit();
+        }
+
+        if(!isset($_POST['slot_id'])){
+            $this->showBookingsPage();
+            exit();
+        }
+
+        $slotId = htmlspecialchars(strip_tags(trim($_POST['slot_id'])), ENT_QUOTES, 'UTF-8');
+        
+        // Fetch slot details
+        $slotDetails = $this->parkingSlotModel->find($slotId);
+        
+        if(!$slotDetails || $slotDetails['status'] != 'available'){
+            $_SESSION["errors"] = "Selected parking slot is not available";
+            $this->showBookingsPage();
+            exit();
+        }
+
+        // Fetch user details
+        $userData = $this->userModel->find($_SESSION["userId"]);
+
+        // Fetch user vehicles
+        $userVehicles = $this->vehicleModel->getUserVehicles($_SESSION["userId"]);
+
+        if(empty($userVehicles)){
+            $_SESSION["errors"] = "Please add a vehicle first before booking";
+            $this->showMyVehiclePage();
+            exit();
+        }
+
+        $datas = [
+            "slotDetails" => $slotDetails,
+            "userData" => $userData,
+            "userVehicles" => $userVehicles,
+            "hourlyRate" => 50 // ₱50 per hour
+        ];
+
+        $this->renderView("user", "bookingDetailsPage", $datas, "bookingDetailsPage");
+    }
+
+
+    public function showPaymentPage(){
+        if(!isset($_SESSION["userId"])){
+            $this->showLoginPage();
+            exit();
+        }
+
+        if($_SERVER["REQUEST_METHOD"] != "POST"){
+            $this->showBookingsPage();
+            exit();
+        }
+
+        // Get form data
+        $slotId = htmlspecialchars(strip_tags(trim($_POST['slot_id'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $vehicleId = htmlspecialchars(strip_tags(trim($_POST['vehicle_id'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $startTime = htmlspecialchars(strip_tags(trim($_POST['start_time'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $endTime = htmlspecialchars(strip_tags(trim($_POST['end_time'] ?? '')), ENT_QUOTES, 'UTF-8');
+
+        // Validate inputs
+        if(empty($slotId) || empty($vehicleId) || empty($startTime) || empty($endTime)){
+            $_SESSION["errors"] = "All fields are required";
+            header("Location: ?controller=UserController&action=showBookingDetailsPage&slot_id=" . $slotId);
+            exit();
+        }
+
+        // Calculate duration and amount
+        $start = new DateTime($startTime);
+        $end = new DateTime($endTime);
+        $interval = $start->diff($end);
+        $hours = $interval->h + ($interval->days * 24);
+        $amount = $hours * 50; // ₱50 per hour
+
+        // Fetch details for display
+        $slotDetails = $this->parkingSlotModel->find($slotId);
+        $vehicleDetails = $this->vehicleModel->find($vehicleId);
+        $userData = $this->userModel->find($_SESSION["userId"]);
+
+        // Store booking data in session for payment processing
+        $_SESSION["pending_booking"] = [
+            "user_id" => $_SESSION["userId"],
+            "vehicle_id" => $vehicleId,
+            "slot_id" => $slotId,
+            "start_time" => $startTime,
+            "end_time" => $endTime,
+            "booking_time" => date('Y-m-d H:i:s'),
+            "amount" => $amount
+        ];
+
+        $datas = [
+            "bookingData" => $_SESSION["pending_booking"],
+            "slotDetails" => $slotDetails,
+            "vehicleDetails" => $vehicleDetails,
+            "userData" => $userData,
+            "amount" => $amount,
+            "hours" => $hours
+        ];
+
+        $this->renderView("user", "paymentPage", $datas, "paymentPage");
+    }
+
+
+    // NEW: Process payment and create booking
+    public function processPayment(){
+        if(!isset($_SESSION["userId"]) || !isset($_SESSION["pending_booking"])){
+            $this->showLoginPage();
+            exit();
+        }
+
+        if($_SERVER["REQUEST_METHOD"] != "POST"){
+            $this->showBookingsPage();
+            exit();
+        }
+
+        $paymentMethod = htmlspecialchars(strip_tags(trim($_POST['payment_method'] ?? '')), ENT_QUOTES, 'UTF-8');
+
+        if(empty($paymentMethod)){
+            $_SESSION["errors"] = "Please select a payment method";
+            $this->showPaymentPage();
+            exit();
+        }
+
+        $bookingData = $_SESSION["pending_booking"];
+
+        // Create booking with status 'pending'
+        $bookingData['status'] = 'pending';
+        $bookingId = $this->bookingModel->create($bookingData);
+
+        if(!$bookingId){
+            $_SESSION["errors"] = "Failed to create booking";
+            $this->showPaymentPage();
+            exit();
+        }
+
+        // Update slot status to 'reserved'
+        $this->parkingSlotModel->update($bookingData['slot_id'], ["status" => "reserved"]);
+
+        // Create payment record
+        $paymentData = [
+            "booking_id" => $bookingId,
+            "amount" => $bookingData['amount'],
+            "payment_method" => $paymentMethod,
+            "payment_status" => ($paymentMethod === "cash") ? "pending" : "paid"
+        ];
+
+        $paymentId = $this->paymentModel->create($paymentData);
+
+        if(!$paymentId){
+            $_SESSION["errors"] = "Payment processing failed";
+            $this->showPaymentPage();
+            exit();
+        }
+
+        // If payment method is online (not cash), update booking status to 'active'
+        if($paymentMethod !== "cash"){
+            $this->bookingModel->update($bookingId, ["status" => "active"]);
+            $this->parkingSlotModel->update($bookingData['slot_id'], ["status" => "occupied"]);
+        }
+
+        // Clear pending booking from session
+        unset($_SESSION["pending_booking"]);
+
+        // Set success message
+        $_SESSION["success"] = "Booking created successfully!";
+
+        // Redirect to activity history
+        $this->showActivityHistoryPage();
+    }
+
+
 
 
 }

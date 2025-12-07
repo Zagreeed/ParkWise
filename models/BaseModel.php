@@ -53,7 +53,7 @@ class BaseModel{
     public function getAll(){
         try{
 
-            $sql = "SELECT * FROM {$this->table}";
+            $sql = "SELECT * FROM {$this->table} ORDER BY created_at DESC ";
 
             $request = $this->db->query($sql);
 
