@@ -1,7 +1,8 @@
 <section class="section visible">
     <h1>Bookings</h1>
     <p class="section-subtitle">View and manage all parking bookings.</p>
- 
+
+   
 
     <div class="table-wrapper">
       <table class="data-table">
@@ -28,9 +29,9 @@
                 <td><?= htmlspecialchars($booking['end_time'] ?? '') ?></td>
                 
                   <td>
-                    <form id="updateForm" action="?controller=AdminController&action=updateBookingStatus" method="post">
+                    <form  class="updateForm" action="?controller=AdminController&action=updateBookingStatus" method="post">
                       <input type="hidden" name="booking_id" value="<?= $booking['booking_id']?>">
-                      <select name="status" onchange="submitStatusChange()" id="selectedStatus" class="status <?= $booking['status']?>" class="status-dropdown">
+                      <select name="status" onchange="this.form.submit()" id="selectedStatus" class="status <?= $booking['status']?>" class="status-dropdown">
                         <option  class="status active"  value="active" <?= $booking['status'] == "active" ? "selected" : "" ?>>Active</option>
                         <option  class="status completed" value="completed" <?= $booking['status'] == "completed" ? "selected" : "" ?>>Completed</option>
                         <option  class="status pending" value="pending" <?= $booking['status'] == "pending" ? "selected" : "" ?>>Pending</option>
@@ -67,12 +68,6 @@
    
   });
 
-
- const form = document.getElementById("updateForm")
-
-    function submitStatusChange(){
-      form.submit();
-    }
 
 
 </script>

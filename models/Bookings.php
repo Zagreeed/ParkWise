@@ -33,7 +33,8 @@ class Bookings extends BaseModel{
                         p.slot_number AS slot,
                         b.start_time,
                         b.end_time,
-                        b.status
+                        b.status,
+                        b.slot_id
                     FROM Bookings b
                     INNER JOIN User u ON b.user_id = u.user_id
                     INNER JOIN Vehicle v ON b.vehicle_id = v.vehicle_id

@@ -68,8 +68,7 @@ class AdminController extends BaseController{
         $this->renderView("admin", "UserDetailsPage", $datas, "userPages");
     }
 
-    public function updateBookingStatus(){
-
+   public function updateBookingStatus(){
 
         if($_SERVER["REQUEST_METHOD"] != "POST"){
             $this->renderView("error", "errorPage");
@@ -77,12 +76,18 @@ class AdminController extends BaseController{
         }
 
         $id = htmlspecialchars(strip_tags(trim($_POST['booking_id'] ?? '')), ENT_QUOTES, 'UTF-8');
-        $datas = [
-                    "status" => htmlspecialchars(strip_tags(trim($_POST['status'] ?? '')), ENT_QUOTES, 'UTF-8'),
-                ];
-            
+        $newStatus = htmlspecialchars(strip_tags(trim($_POST['status'] ?? '')), ENT_QUOTES, 'UTF-8');
+        
+      
+        $booking = $this->bookingModel->find($id);
+        
+        if(!$booking){
+            $this->renderView("error", "errorPage");
+            exit();    
+        }
 
-            
+       
+        $datas = ["status" => $newStatus];
         $request = $this->bookingModel->update($id, $datas);
 
         if(!$request){
@@ -90,9 +95,26 @@ class AdminController extends BaseController{
             exit();    
         }
 
+        
+        if($newStatus === "completed" && isset($booking['slot_id'])){
+            $slotData = ["status" => "available"];
+            $this->parkingSlotModel->update($booking['slot_id'], $slotData);
+        }
+
+  
+        if($newStatus === "active" && isset($booking['slot_id'])){
+            $slotData = ["status" => "occupied"];
+            $this->parkingSlotModel->update($booking['slot_id'], $slotData);
+        }
+
+        
+        if($newStatus === "pending" && isset($booking['slot_id'])){
+            $slotData = ["status" => "reserved"];
+            $this->parkingSlotModel->update($booking['slot_id'], $slotData);
+        }
+
         $this->getBookingsPage();
         exit();
-
     }
 
 
