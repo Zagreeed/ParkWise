@@ -27,5 +27,38 @@ class Vehicle extends BaseModel{
             return [];
         }
     }
+
+    public function getVehicleCountType(){
+        try{
+            $sql = "SELECT 
+                        SUM(CASE WHEN vehicle_type = 'Car' THEN 1 ELSE 0 END) AS car_count,
+                        SUM(CASE WHEN vehicle_type = 'Motorcycle' THEN 1 ELSE 0 END) AS motorcycle_count,
+                        SUM(CASE WHEN vehicle_type = 'Truck' THEN 1 ELSE 0 END) AS truck_count,
+                        COUNT(*) AS total_vehicles
+                    FROM Vehicle";
+
+            $request = $this->db->prepare($sql);
+            $request->execute();
+
+            $data = $request->fetch(PDO::FETCH_ASSOC);
+
+                
+            return $data ?: [
+                'car_count' => 0,
+                'motorcycle_count' => 0,
+                'truck_count' => 0,
+                'total_vehicles' => 0
+            ];
+        }catch(PDOException $e){
+            error_log($e->getMessage());
+           
+            return [
+                'car_count' => 0,
+                'motorcycle_count' => 0,
+                'truck_count' => 0,
+                'total_vehicles' => 0
+            ];
+        }
+    }
    
 }

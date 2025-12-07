@@ -39,4 +39,40 @@ class ParkingSlot extends BaseModel{
             return [];
         }
     }
+
+    public function getSlotsAvailability(){
+        try{
+
+            $sql = "SELECT 
+                        SUM(CASE WHEN status = 'available' THEN 1 ELSE 0 END) AS available_count,
+                        SUM(CASE WHEN status = 'reserved' THEN 1 ELSE 0 END) AS reserved_count,
+                        SUM(CASE WHEN status = 'occupied' THEN 1 ELSE 0 END) AS occupied_count,
+                        COUNT(*) AS total_slots
+                    FROM ParkingSlot;";
+
+            $request = $this->db->prepare($sql);
+            $request->execute();
+
+
+            $data = $request->fetch(PDO::FETCH_ASSOC);
+
+
+           return $data ?: [  
+            'available_count' => 0,
+            'reserved_count' => 0,
+            'occupied_count' => 0,
+            'total_slots' => 0
+        ];
+
+        }catch(PDOException $e){
+            error_log($e->getMessage());
+           return $data ?: [  
+            'available_count' => 0,
+            'reserved_count' => 0,
+            'occupied_count' => 0,
+            'total_slots' => 0
+        ];
+
+        }
+    }
 }

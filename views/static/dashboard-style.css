@@ -481,9 +481,11 @@ body {
   border-radius: 50%;
 }
 
+
+
 /* Status colors for legend */
-.legend-circle.available { background: #ff4b4b; } 
-.legend-circle.occupied { background: #30bf7f; }  
+.legend-circle.available { background: #30bf7f; } 
+.legend-circle.occupied { background: #ff4b4b; }  
 .legend-circle.reserved { background: #ff9f40; }  
 
 /* ===== RESPONSIVE ===== */
@@ -584,13 +586,14 @@ body {
   display: inline-block;
 }
 .status.available { 
-  background: #f8b8b3; 
-  color: #a71c12;
+  background: #a8f0ba;
+  color:#159435;
 }
 
 .status.occupied { 
-  background: #a8f0ba;
-  color:#159435;
+  background: #f8b8b3; 
+  color: #a71c12;
+  
 }
 
 .status.reserved {

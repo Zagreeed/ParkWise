@@ -6,6 +6,7 @@ class AdminController extends BaseController{
     protected $parkingSlotModel;
     protected $paymentModel;
     protected $userModel; 
+    protected $vehicleModel; 
 
 
     public function __construct(){
@@ -13,6 +14,7 @@ class AdminController extends BaseController{
         $this->parkingSlotModel = $this->loadModel("ParkingSlot");
         $this->paymentModel = $this->loadModel("Payments");
         $this->userModel = $this->loadModel("User");
+        $this->vehicleModel = $this->loadModel("Vehicle");
     }
 
 
@@ -22,13 +24,16 @@ class AdminController extends BaseController{
         $availableSlot = $this->parkingSlotModel->getAvailableSlot();
         $totalRevenue = $this->paymentModel->getRevenue();
         $totalUser = $this->userModel->getTotalUser();
-
+        $slotAvailability = $this->parkingSlotModel->getSlotsAvailability();
+        $allVehiclesTypesCount = $this->vehicleModel->getVehicleCountType();
 
         $datas = [
             "totalBookings" => $totalBookings,
             "availableSlot" => $availableSlot,
             "totalRevenue" => $totalRevenue,
             "totalUser" => $totalUser,
+            "slotAvailability" => $slotAvailability,
+            "vehicleCount" => $allVehiclesTypesCount,
         ];
 
 
@@ -61,6 +66,33 @@ class AdminController extends BaseController{
         $datas = $this->userModel->getAllUser();
 
         $this->renderView("admin", "UserDetailsPage", $datas, "userPages");
+    }
+
+    public function updateBookingStatus(){
+
+
+        if($_SERVER["REQUEST_METHOD"] != "POST"){
+            $this->renderView("error", "errorPage");
+            exit();    
+        }
+
+        $id = htmlspecialchars(strip_tags(trim($_POST['booking_id'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $datas = [
+                    "status" => htmlspecialchars(strip_tags(trim($_POST['status'] ?? '')), ENT_QUOTES, 'UTF-8'),
+                ];
+            
+
+            
+        $request = $this->bookingModel->update($id, $datas);
+
+        if(!$request){
+            $this->renderView("error", "errorPage");
+            exit();    
+        }
+
+        $this->getBookingsPage();
+        exit();
+
     }
 
 

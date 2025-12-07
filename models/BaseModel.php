@@ -94,6 +94,20 @@ class BaseModel{
         }
     }
 
+    public function updateOneField($id, $field, $data){
+        try{
+            $sql = "UPDATE {$this->table} SET {$field} = :value WHERE  {$this->primaryKey} = :id";
+
+            $request = $this->db->prepare($sql);
+            $request->execute(["value" => $data, "id" => $id]);
+
+            return $request->rowCount() > 0;
+        }catch(PDOException $e){
+            error_log($e->getMessage());
+            return false;
+        }
+    }
+
 
     public function delete($id){
         try{

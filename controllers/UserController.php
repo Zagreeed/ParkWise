@@ -250,7 +250,9 @@ class UserController extends BaseController{
 
         exit();
 
-        }
+    }
+
+
 
 
     public function showAddVehichelPage(){
@@ -301,7 +303,7 @@ class UserController extends BaseController{
             exit();    
         };
 
-        $this->showDashBoard();
+        $this->showMyVehiclePage();
         exit();
 
     }
