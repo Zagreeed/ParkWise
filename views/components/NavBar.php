@@ -14,35 +14,57 @@
 
   <ul class="sidebar-nav">
 
-    <li class="nav-item active" onclick="showSection('dashboard', event)" data-tooltip="Dashboard">
-      <i class="fa-solid fa-chart-line"></i>
-      <span class="nav-label">Dashboard</span>
+    <li class="nav-item active" data-tooltip="Dashboard">
+      <a href="?controller=AdminController&action=getDashBoardData">
+        <i class="fa-solid fa-chart-line"></i>
+        <span class="nav-label">Dashboard</span>
+      </a>
     </li>
 
-    <li class="nav-item" onclick="showSection('slots', event)" data-tooltip="Parking Slots">
-      <i class="fa-solid fa-square-parking"></i>
-      <span class="nav-label">Parking Slots</span>
+    <li class="nav-item" data-tooltip="Parking Slots">
+      <a href="?controller=AdminController&action=getParkingSlotsPage">
+        <i class="fa-solid fa-square-parking"></i>
+        <span class="nav-label">Parking Slots</span>
+      </a>
     </li>
 
-    <li class="nav-item" onclick="showSection('bookings', event)" data-tooltip="Bookings">
-      <i class="fa-solid fa-calendar-check"></i>
-      <span class="nav-label">Bookings</span>
+    <li class="nav-item"  data-tooltip="Bookings">
+      <a href="?controller=AdminController&action=getBookingsPage">
+        <i class="fa-solid fa-calendar-check"></i>
+        <span class="nav-label">Bookings</span>
+      </a>
     </li>
 
-    <li class="nav-item" onclick="showSection('users', event)" data-tooltip="Users">
-      <i class="fa-solid fa-users"></i>
-      <span class="nav-label">Users</span>
+    <li class="nav-item" data-tooltip="Users">
+      <a href="?controller=AdminController&action=getUserContactPage">
+        <i class="fa-solid fa-users"></i>
+        <span class="nav-label">Users</span>
+      </a>
     </li>
 
-    <li class="nav-item" onclick="showSection('payments', event)" data-tooltip="Payments">
-      <i class="fa-solid fa-credit-card"></i>
-      <span class="nav-label">Payments</span>
+    <li class="nav-item"  data-tooltip="Payments">
+      <a href="?controller=AdminController&action=getPaymentsPage">
+        <i class="fa-solid fa-credit-card"></i>
+        <span class="nav-label">Payments</span>
+      </a>
     </li>
 
-    <li class="nav-item" onclick="logout()" data-tooltip="Logout">
-      <i class="fa-solid fa-right-from-bracket"></i>
-      <span class="nav-label">Logout</span>
+    <li class="nav-item" data-tooltip="Logout">
+      <a href="?controller=AdminController&action=">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span class="nav-label">Logout</span>
+      </a>
     </li>
 
   </ul>
 </div>
+
+<script>
+    // Sidebar Toggle
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('toggleSidebar');
+
+  toggleBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('collapsed');
+  });
+</script>

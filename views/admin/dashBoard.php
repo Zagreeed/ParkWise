@@ -121,6 +121,18 @@
   </section>
 
 <script>
+    // Sidebar Toggle
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('toggleSidebar');
+
+  toggleBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('collapsed');
+  });
+</script>
+
+
+<script>
+
       // Only run dashboard-specific code if we're on the dashboard
       document.addEventListener("DOMContentLoaded", () => {
         // Check if dashboard elements exist
