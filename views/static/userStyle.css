@@ -838,6 +838,10 @@ nav a:hover, nav a.active {
     background: #e8f5e9;
     color: #2e7d32;
 }
+.activity-status.pending {
+    background: #f3cd90;
+    color: #c57b05;
+}
 
 .activity-status.active {
    background: #98cbe2;

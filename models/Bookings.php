@@ -158,4 +158,25 @@ class Bookings extends BaseModel{
         }
     }
 
+    public function getActiveBookingBySlot($slotId){
+        try{
+            $sql = "SELECT * FROM {$this->table} 
+                    WHERE slot_id = :slotId 
+                    AND status IN ('active', 'pending') 
+                    ORDER BY booking_time DESC 
+                    LIMIT 1";
+
+            $request = $this->db->prepare($sql);
+            $request->execute(["slotId" => $slotId]);
+
+            $data = $request->fetch(PDO::FETCH_ASSOC);
+
+            return $data ?: false;
+
+        }catch(PDOException $e){
+            error_log($e->getMessage());
+            return false;
+        }
+    }
+
 }

@@ -83,7 +83,7 @@ class AdminController extends BaseController{
     }
 
 
-       public function Adminlogout(){
+    public function Adminlogout(){
 
         if($_SERVER["REQUEST_METHOD"] != "POST"){
             $this->renderView("error", "errorPage");
@@ -155,7 +155,6 @@ class AdminController extends BaseController{
     }
 
    public function updateBookingStatus(){
-
         if($_SERVER["REQUEST_METHOD"] != "POST"){
             $this->renderView("error", "errorPage");
             exit();    
@@ -208,6 +207,71 @@ class AdminController extends BaseController{
     }
 
 
+
+    public function updateSlotStatus(){
+        if($_SERVER["REQUEST_METHOD"] != "POST"){
+            $this->renderView("error", "errorPage");
+            exit();    
+        }
+
+        $slotId = htmlspecialchars(strip_tags(trim($_POST['slot_id'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $newStatus = htmlspecialchars(strip_tags(trim($_POST['status'] ?? '')), ENT_QUOTES, 'UTF-8');
+        
+    
+        if(empty($slotId) || empty($newStatus)){
+            $_SESSION["errors"] = "Slot ID and status are required";
+            $this->getParkingSlotsPage();
+            exit();
+        }
+
+        
+        $validStatuses = ['available', 'occupied', 'reserved'];
+        if(!in_array($newStatus, $validStatuses)){
+            $_SESSION["errors"] = "Invalid status value";
+            $this->getParkingSlotsPage();
+            exit();
+        }
+
+      
+        $slot = $this->parkingSlotModel->find($slotId);
+        
+        if(!$slot){
+            $_SESSION["errors"] = "Parking slot not found";
+            $this->getParkingSlotsPage();
+            exit();    
+        }
+
+        
+        $activeBooking = $this->bookingModel->getActiveBookingBySlot($slotId);
+        
+  
+        if($newStatus === 'available' && $activeBooking){
+            $_SESSION["errors"] = "Cannot set slot to available - there is an active booking (ID: " . $activeBooking['booking_id'] . ")";
+            $this->getParkingSlotsPage();
+            exit();
+        }
+
+      
+        $data = ["status" => $newStatus];
+        $request = $this->parkingSlotModel->update($slotId, $data);
+
+        if(!$request){
+            $_SESSION["errors"] = "Failed to update slot status";
+            $this->getParkingSlotsPage();
+            exit();    
+        }
+
+       
+        $statusMessages = [
+            'available' => "Slot {$slot['slot_number']} is now available for booking",
+            'occupied' => "Slot {$slot['slot_number']} marked as occupied (maintenance/blocked)",
+            'reserved' => "Slot {$slot['slot_number']} marked as reserved"
+        ];
+
+        $_SESSION["success"] = $statusMessages[$newStatus];
+        $this->getParkingSlotsPage();
+        exit();
+    }
 
 
 

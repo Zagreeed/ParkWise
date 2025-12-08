@@ -91,7 +91,7 @@ class UserController extends BaseController{
 
     public function showDashBoard(){
 
-        ///NEED THE USERID
+       
 
         if(!isset($_SESSION["userId"])){
             $this->showLoginPage();
@@ -101,18 +101,18 @@ class UserController extends BaseController{
         $userId = $_SESSION["userId"];
 
 
-        /// FETCH THE USER INFOS
+
         $userData = $this->userModel->find($userId);
 
-        /// FETCH THE TOTAL SPENT(MONEY) ON BOOKINGS
+  
         $totalSpent = $this->paymentModel->getTotalSpentForAMonth($userId);
-        /// FETCH THE USER TOTAL BOOKINGS
+        
         $totalBookings = $this->bookingModel->getAllUserBookings($userId);
-        /// FETCH HOURSE PARKED FOR THIS MONTH
+       
         $totalHourseSpent = $this->bookingModel->getUserTotalBookingTime($userId);
-        /// FETCH ALL "AVAILABLE" PARKING SLOTS
+       
         $availableParkingSlot = $this->parkingSlotModel->getAvailableSlotDetail();
-        /// FETCH ALL BOOKINGS THE USER MAKE FOR THE ACTIVITY SECTION
+       
         $activityHistory = $this->bookingModel->getAllUserBookingHistory($userId);
 
         
@@ -309,6 +309,76 @@ class UserController extends BaseController{
     }
 
 
+    
+    public function showEditVehiclePage(){
+        if(!isset($_SESSION["userId"])){
+            $this->showLoginPage();
+            exit();
+        }
+
+        if(!isset($_GET['vehicle_id'])){
+            $this->showMyVehiclePage();
+            exit();
+        }
+
+        $vehicleId = htmlspecialchars(strip_tags(trim($_GET['vehicle_id'])), ENT_QUOTES, 'UTF-8');
+        
+        $vehicleData = $this->vehicleModel->find($vehicleId);
+        
+        if(!$vehicleData || $vehicleData['user_id'] != $_SESSION["userId"]){
+            $_SESSION["errors"] = "Vehicle not found or you don't have permission to edit it";
+            $this->showMyVehiclePage();
+            exit();
+        }
+
+        $this->renderView("user", "editVehiclePage", $vehicleData, "editVehiclePage");
+    }
+
+    public function updateVehicle(){
+        if($_SERVER["REQUEST_METHOD"] != "POST"){
+            $this->renderView("error", "errorPage");
+            exit();    
+        }
+
+        $datas = [
+            "vehicle_id" => htmlspecialchars(strip_tags(trim($_POST['vehicle_id'] ?? '')), ENT_QUOTES, 'UTF-8'),
+            "plate_number" => htmlspecialchars(strip_tags(trim($_POST['plate_number'] ?? '')), ENT_QUOTES, 'UTF-8'),
+            "vehicle_type" => htmlspecialchars(strip_tags(trim($_POST['vehicle_type'] ?? '')), ENT_QUOTES, 'UTF-8'),
+            "brand" => htmlspecialchars(strip_tags(trim($_POST['brand'] ?? '')), ENT_QUOTES, 'UTF-8'),
+        ];
+
+        $errors = [];
+
+        foreach($datas as $key => $value){
+            if(empty($value)){
+                $errors[] = "$key" . " is required";
+            }
+        }
+
+        if(!empty($errors)){
+            $_SESSION["errors"] = $errors;
+            header("Location: ?controller=UserController&action=showEditVehiclePage&vehicle_id=" . $datas['vehicle_id']);
+            exit();
+        }
+
+        $vehicleId = $datas['vehicle_id'];
+        unset($datas['vehicle_id']);
+
+        $data = $this->vehicleModel->update($vehicleId, $datas);
+
+        if(!$data){
+            $_SESSION["errors"] = "Something went wrong while updating the vehicle!";
+            header("Location: ?controller=UserController&action=showEditVehiclePage&vehicle_id=" . $vehicleId);
+            exit();    
+        }
+
+        $_SESSION["success"] = "Vehicle updated successfully!";
+        $this->showMyVehiclePage();
+        exit();
+    }
+
+   
+
     public function deleteVehicle(){
         if($_SERVER["REQUEST_METHOD"] != "POST"){
             $this->renderView("error", "errorPage");
@@ -317,18 +387,38 @@ class UserController extends BaseController{
 
         $id = htmlspecialchars(strip_tags(trim($_POST['vehicle_id'] ?? '')), ENT_QUOTES, 'UTF-8');
 
+        if(empty($id)){
+            $_SESSION["errors"] = "Vehicle ID is required";
+            $this->showMyVehiclePage();
+            exit();
+        }
+
+    
+        $vehicle = $this->vehicleModel->find($id);
+        
+        if(!$vehicle){
+            $_SESSION["errors"] = "Vehicle not found";
+            $this->showMyVehiclePage();
+            exit();
+        }
+
+        if($vehicle['user_id'] != $_SESSION["userId"]){
+            $_SESSION["errors"] = "You don't have permission to delete this vehicle";
+            $this->showMyVehiclePage();
+            exit();
+        }
+
         $request = $this->vehicleModel->delete($id);
 
         if(!$request){
-            $this->renderView("error", "errorPage");
+            $_SESSION["errors"] = "Failed to delete vehicle. Please try again.";
+            $this->showMyVehiclePage();
             exit();    
         }
 
-
-        $this->showAddVehichelPage();
+        $_SESSION["success"] = "Vehicle deleted successfully!";
+        $this->showMyVehiclePage();
         exit();
-
-
     }
 
 
@@ -533,10 +623,10 @@ class UserController extends BaseController{
             exit();
         }
 
-        // If payment method is online (not cash), update booking status to 'active'
+      
         if($paymentMethod !== "cash"){
-            $this->bookingModel->update($bookingId, ["status" => "active"]);
-            $this->parkingSlotModel->update($bookingData['slot_id'], ["status" => "occupied"]);
+            $this->bookingModel->update($bookingId, ["status" => "pending"]);
+            $this->parkingSlotModel->update($bookingData['slot_id'], ["status" => "reserved"]);
         }
 
         // Clear pending booking from session
