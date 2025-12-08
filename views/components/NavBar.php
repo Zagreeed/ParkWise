@@ -50,7 +50,7 @@
     </li>
 
     <li class="nav-item" data-tooltip="Logout">
-      <a href="?controller=AdminController&action=">
+      <a href="?controller=AdminController&action=showAdminLoginPage">
         <i class="fa-solid fa-right-from-bracket"></i>
         <span class="nav-label">Logout</span>
       </a>

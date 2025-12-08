@@ -213,7 +213,7 @@
                 <span class="route-icon">⚙️</span>
                 <h2 class="route-title">Admin Panel</h2>
                 <p class="route-description">Manage slots and monitor bookings</p>
-                <a href="?controller=AdminController&action=getDashBoardData" class="route-btn">Continue as Admin</a>
+                <a href="?controller=AdminController&action=showAdminLoginPage" class="route-btn">Continue as Admin</a>
             </div>
         </div>
     </div>

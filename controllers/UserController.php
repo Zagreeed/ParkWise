@@ -309,46 +309,28 @@ class UserController extends BaseController{
     }
 
 
-    /// NOT DONE!!!
-    public function createBooking(){
-
-         if(!isset($_SESSION["userId"])){
-            $this->showLoginPage();
-            exit();
-        }
-
-
-         if($_SERVER["REQUEST_METHOD"] != "POST"){
+    public function deleteVehicle(){
+        if($_SERVER["REQUEST_METHOD"] != "POST"){
             $this->renderView("error", "errorPage");
-            exit();
+            exit();    
+        }
+
+        $id = htmlspecialchars(strip_tags(trim($_POST['vehicle_id'] ?? '')), ENT_QUOTES, 'UTF-8');
+
+        $request = $this->vehicleModel->delete($id);
+
+        if(!$request){
+            $this->renderView("error", "errorPage");
+            exit();    
         }
 
 
-        $datas = [
-            "user_id" => htmlspecialchars(strip_tags(trim($_POST['user_id'] ?? '')), ENT_QUOTES, 'UTF-8'),
-            "vehicle_id" => htmlspecialchars(strip_tags(trim($_POST['vehicle_id'] ?? '')), ENT_QUOTES, 'UTF-8'),
-            "slot_id" => htmlspecialchars(strip_tags(trim($_POST['slot_id'] ?? '')), ENT_QUOTES, 'UTF-8'),
-            "booking_time" => htmlspecialchars(strip_tags(trim($_POST['booking_time'] ?? '')), ENT_QUOTES, 'UTF-8'),
-            "start_time" => htmlspecialchars(strip_tags(trim($_POST['start_time'] ?? '')), ENT_QUOTES, 'UTF-8'),
-            "end_time" => htmlspecialchars(strip_tags(trim($_POST['end_time'] ?? '')), ENT_QUOTES, 'UTF-8'),
-        ];
-
-        $errors = [];
-
-        foreach($datas as $key => $value){
-            if(empty($value)){
-                $errors[] = "$key" . " is required";
-            }
-        }
-
-        if(!empty($errors)){
-            $_SESSION["errors"] = $errors;
-            $this->showSignUpPage();
-            exit();
-        }
+        $this->showAddVehichelPage();
+        exit();
 
 
     }
+
 
 
     public function updateProfile(){
@@ -500,7 +482,7 @@ class UserController extends BaseController{
     }
 
 
-    // NEW: Process payment and create booking
+   
     public function processPayment(){
         if(!isset($_SESSION["userId"]) || !isset($_SESSION["pending_booking"])){
             $this->showLoginPage();

@@ -17,8 +17,94 @@ class AdminController extends BaseController{
         $this->vehicleModel = $this->loadModel("Vehicle");
     }
 
+    
+    public function showAdminLoginPage(){
+
+
+        $this->renderView("login", "adminLogin");
+    }
+
+
+    
+
+    public function Adminlogin(){
+        if($_SERVER["REQUEST_METHOD"] != "POST"){
+            $this->renderView("error", "errorPage");
+            exit();
+        }
+
+        $datas = [
+            "email" => htmlspecialchars(strip_tags(trim($_POST['email'] ?? '')), ENT_QUOTES, 'UTF-8'),
+            "password" => htmlspecialchars(strip_tags(trim($_POST['password'] ?? '')), ENT_QUOTES, 'UTF-8'),
+        ];
+
+        if(empty($datas["email"])){
+            $_SESSION["errors"] = "Email is required";
+            $this->showAdminLoginPage();
+            exit();
+        }
+
+        if(empty($datas["password"])){
+            $_SESSION["errors"] = "Password is required";
+            $this->showAdminLoginPage();
+            exit();
+        }
+
+
+        $user = $this->userModel->findUserByEmail($datas["email"]);
+
+        if($user["role"] != "admin"){
+            $_SESSION["errors"] = "Invalid Authorization";
+          
+            $this->showAdminLoginPage();
+            exit();
+        }
+
+        if(!$user){
+            $_SESSION["errors"] = "User is not Found";
+            $this->showAdminLoginPage();
+            exit();
+        }
+
+
+
+
+        if($user["password"] != $datas["password"]){
+            $_SESSION["errors"] = "Password is incorrect";
+            $this->showAdminLoginPage();
+            exit();
+        }
+
+
+        /// REDIRECT USER TO THE USE DASHBOARD WITH ITS DASHBOARD DATA
+        $_SESSION["adminId"] = $user["user_id"];
+        $this->getDashBoardData();
+
+    }
+
+
+       public function Adminlogout(){
+
+        if($_SERVER["REQUEST_METHOD"] != "POST"){
+            $this->renderView("error", "errorPage");
+            exit();
+        }
+
+        $_SESSION = [];
+        session_destroy();
+
+        $this->showAdminLoginPage();
+        
+    }
+
+
 
     public function getDashBoardData(){
+
+           if(!isset($_SESSION["adminId"])){
+            $this->showAdminLoginPage();
+            exit();
+        }
 
         $totalBookings = $this->bookingModel->getTotalBookings();
         $availableSlot = $this->parkingSlotModel->getAvailableSlot();

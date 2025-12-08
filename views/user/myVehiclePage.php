@@ -26,8 +26,13 @@
                                 <p class="vehicle-details">Added At: <?= $vehicle["created_at"]?> | Type: <?= $vehicle["vehicle_type"]?></p>
                             </div>
                             <div class="vehicle-actions">
-                                <button class="btn-edit">Edit</button>
-                                <button class="btn-delete">Delete</button>
+                                <form action="?controller=UserController&action=updateVehicle">
+                                    <button class="btn-edit">Edit</button>
+                                </form>
+                                <form action="?controller=UserController&action=deleteVehicle" method="post">
+                                    <input type="hidden" name="vehicle_id" value="<?= $vehicle["vehicle_id"]?>">
+                                    <button type="submit" class="btn-delete">Delete</button>
+                                </form>
                             </div>
                         </div>
                     <?php endforeach;?>
