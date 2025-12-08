@@ -15,7 +15,6 @@
       </div>
     </div>
 
-    <!-- TOTAL CARDS -->
     <div class="cards-container">
 
       <div class="card">
@@ -52,7 +51,7 @@
 
     </div>
 
-    <!-- ANALYTICS ROW -->
+
     <div class="analytics-row">
         
         <div class="donut-card">
@@ -77,7 +76,7 @@
         </div>
       </div>
 
-      <!-- VEHICLE TYPES -->
+    
       <div class="vehicle-card">
         <h3>Vehicles by Type</h3>
 

@@ -8,7 +8,7 @@
 
     <form method="POST" action="?controller=UserController&action=showPaymentPage" class="booking-details-wrapper">
         
-        <!-- Left Card - Booking Information -->
+    
         <div class="card booking-info-card">
             <h2>📋 Booking Information</h2>
             
@@ -101,7 +101,6 @@
             <input type="hidden" name="slot_id" value="<?= $content['slotDetails']['slot_id'] ?>">
         </div>
 
-        <!-- Right Card - Rate Information -->
         <div class="card rate-info-card">
             <h2>💰 Per Hour Amount Base Rate</h2>
             

@@ -228,7 +228,6 @@
                 </div>
             </div>
 
-            <!-- Remember / Forgot -->
             <div class="remember-forgot">
                 <label>
                     <input type="checkbox" id="rememberMe">Remember me</label>

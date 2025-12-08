@@ -1,4 +1,4 @@
- <!-- Modal -->
+
     <div class="modal-overlay" id="addVehicleModal">
         <div class="modal-container">
             <div class="modal-header">
@@ -7,10 +7,10 @@
             </div>
 
             <form class="modal-form" method="post" action="?controller=UserController&action=addVehicle">
-                <!-- Hidden User ID (you'll need to set this from PHP) -->
+               
                 <input type="hidden" name="user_id" value="<?php echo $_SESSION['userId'] ?? ''; ?>">
 
-                <!-- License Plate Number -->
+           
                 <div class="form-group">
                     <label for="plate_number">License Plate Number</label>
                     <input 

@@ -1,11 +1,9 @@
 <div class="sidebar collapsed" id="sidebar">
 
-  <!-- Logo -->
   <div class="sidebar-icon" onclick="showSection('dashboard', event)">
     <img src="<?php echo BASE_URL?>views/static/Images/logo1.png" alt="ParkWise Icon">
   </div>
 
-  <!-- Menu Toggle -->
   <div class="menu-toggle" id="toggleSidebar">
     <i class="fa-solid fa-bars burger"></i>
     <span class="menu-label">Menu</span>

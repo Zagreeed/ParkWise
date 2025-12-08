@@ -5,27 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>ParkWise Admin - <?= ucfirst($location ?? 'Dashboard') ?></title>
-    
-    <!-- FONT AWESOME ICONS -->
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
-    <!-- ADMIN STYLES -->
+
     <link rel="stylesheet" href="<?php echo BASE_URL?>views/static/dashboard-style.css">
 </head>
 <body class="dashboard-body">
 
-    <!-- SIDEBAR -->
+ 
     <?php require_once("./views/components/NavBar.php")?>
 
-    <!-- MAIN CONTENT -->
+    
     <div class="main-content">
         <?php require_once("./views/admin/$fileName" . ".php")?>
     </div>
 
-    <!-- CHART.JS LIBRARY -->
+   
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- GLOBAL ADMIN SCRIPT (handles navigation, sidebar, etc.) -->
+  
     <script>
         // Global Admin Dashboard Script
         document.addEventListener("DOMContentLoaded", () => {

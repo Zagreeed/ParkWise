@@ -200,7 +200,7 @@
         <p class="subtitle">Choose how you want to continue</p>
 
         <div class="route-selection">
-            <!-- User Route -->
+          
             <div class="route-card">
                 <span class="route-icon">🚗</span>
                 <h2 class="route-title">User Portal</h2>
@@ -208,7 +208,6 @@
                 <a href="?controller=UserController&action=showLoginPage" class="route-btn">Continue as User</a>
             </div>
 
-            <!-- Admin Route -->
             <div class="route-card">
                 <span class="route-icon">⚙️</span>
                 <h2 class="route-title">Admin Panel</h2>

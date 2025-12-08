@@ -68,7 +68,7 @@ class UserController extends BaseController{
         }
 
 
-        /// REDIRECT USER TO THE USE DASHBOARD WITH ITS DASHBOARD DATA
+   
         $_SESSION["userId"] = $user["user_id"];
         $this->showDashBoard();
 
@@ -125,7 +125,7 @@ class UserController extends BaseController{
             "activityHistory" => $activityHistory,
         ];
 
-        /// QUERY ALL THE DATA NEEDED FOR THE DASH-BOARD
+      
 
         $this->renderView("user", "dashBoard", $datas, "dashBoard");
 
@@ -238,11 +238,10 @@ class UserController extends BaseController{
         }
         
         
-        /// REDIRRECT TO SHOW THE ADD/CREATE VEHICHLE PAGE
+       
         $_SESSION["userId"] = $userId;
 
-        /// LETS DO THIS WHEN THERES A UI FOR THIS TEMPORARY LETS REDIRECT THE USER TO THE DASHBOARD
-        // $this->showAddVehichelPage();
+      
 
 
         $this->showDashBoard();

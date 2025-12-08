@@ -7,12 +7,10 @@
     </div>
 
     <form method="POST" action="?controller=UserController&action=processPayment" class="payment-wrapper">
-        
-        <!-- Left Side - Payment Selection -->
+ 
         <div class="card payment-card">
             <h2>💳 Payment Method</h2>
 
-            <!-- Booking Summary Header -->
             <div class="payment-summary">
                 <div class="summary-item">
                     <span class="summary-label">Booking ID</span>
@@ -28,11 +26,11 @@
                 </div>
             </div>
 
-            <!-- Payment Methods -->
+   
             <div class="payment-methods-section">
                 <h3>Digital Wallets</h3>
                 
-                <!-- GCash -->
+               
                 <label class="payment-method-option">
                     <input type="radio" name="payment_method" value="gcash" required>
                     <div class="payment-method-card">
@@ -50,7 +48,7 @@
 
                 <h3>Credit/Debit Cards</h3>
                 
-                <!-- Credit/Debit Card -->
+               
                 <label class="payment-method-option">
                     <input type="radio" name="payment_method" value="mastercard">
                     <div class="payment-method-card">
@@ -68,7 +66,7 @@
 
                 <h3>Other Payment Options</h3>
                 
-                <!-- PayPal -->
+        
                 <label class="payment-method-option">
                     <input type="radio" name="payment_method" value="paypal">
                     <div class="payment-method-card">
@@ -84,7 +82,7 @@
                     </div>
                 </label>
 
-                <!-- Cash -->
+        
                 <label class="payment-method-option">
                     <input type="radio" name="payment_method" value="cash">
                     <div class="payment-method-card">
@@ -101,17 +99,16 @@
                 </label>
             </div>
 
-            <!-- Security Note -->
+
             <div class="security-note">
                 <i class="fa-solid fa-shield-halved"></i>
                 <p>For security, we do not save payment info. We do not have access to your payment details platform, so we do not have access to your payment details</p>
             </div>
 
-            <!-- Confirm Payment Button -->
           
         </div>
 
-        <!-- Right Side - Booking Details -->
+   
         <div class="card booking-details-card">
             <h2>📄 Booking Details</h2>
 
@@ -160,7 +157,7 @@
                 </div>
             </div>
 
-            <!-- Total Amount Section -->
+     
             <div class="total-section">
                 <span class="total-label">Total Amount</span>
                 <span class="total-amount">₱<?= number_format($content['amount'], 2) ?></span>

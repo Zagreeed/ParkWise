@@ -76,7 +76,7 @@ class AdminController extends BaseController{
         }
 
 
-        /// REDIRECT USER TO THE USE DASHBOARD WITH ITS DASHBOARD DATA
+       
         $_SESSION["adminId"] = $user["user_id"];
         $this->getDashBoardData();
 
