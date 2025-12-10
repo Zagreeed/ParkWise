@@ -52,7 +52,7 @@ class Payments extends BaseModel{
     }
 
 
-    public function getPaymentByBookingId($id){
+   public function getPaymentByBookingId($id){
         try{
 
             $sql = "SELECT * FROM {$this->table} WHERE booking_id = :id";
@@ -62,11 +62,11 @@ class Payments extends BaseModel{
 
             $data = $request->fetch(PDO::FETCH_ASSOC);
 
-
-            return !empty($data) ? $data : false;
+            // Return the data or false if not found
+            return $data ?: false;
 
         }catch(PDOException $e){
-            error_log($e->getMessage());
+            error_log("Error in getPaymentByBookingId: " . $e->getMessage());
             return false;
         }
     }

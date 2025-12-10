@@ -8,7 +8,6 @@
 
     <form method="POST" action="?controller=UserController&action=showPaymentPage" class="booking-details-wrapper">
         
-    
         <div class="card booking-info-card">
             <h2>📋 Booking Information</h2>
             
@@ -20,7 +19,7 @@
                     </div>
                     <div class="info-box">
                         <span class="info-label">Amount</span>
-                        <span class="info-value amount-highlight">₱50.00</span>
+                        <span class="info-value amount-highlight" id="display-amount">₱50.00</span>
                     </div>
                 </div>
 
@@ -89,13 +88,28 @@
                     <input type="datetime-local" name="start_time" id="start_time" class="form-input" required>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="end-time-group">
                     <label for="end_time">
                         <i class="fa-solid fa-clock"></i>
                         End Time
                     </label>
-                    <input type="datetime-local" name="end_time" id="end_time" class="form-input" required>
+                    <input type="datetime-local" name="end_time" id="end_time" class="form-input">
                 </div>
+            </div>
+
+            <!-- Open Time Checkbox -->
+            <div class="form-group" style="margin-top: 1rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" id="open_time_checkbox" name="open_time" value="1" 
+                           style="width: 18px; height: 18px; cursor: pointer; accent-color: #66bb6a;">
+                    <span style="font-weight: 600; color: #1b5e20;">
+                        <i class="fa-solid fa-infinity"></i>
+                        Open Time (Uncertain end time)
+                    </span>
+                </label>
+                <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; margin-left: 1.5rem;">
+                    Select this if you don't know how long you'll need the parking spot. Payment will be calculated when you leave.
+                </p>
             </div>
 
             <input type="hidden" name="slot_id" value="<?= $content['slotDetails']['slot_id'] ?>">
@@ -112,7 +126,7 @@
             </div>
 
             <div class="rate-details">
-                <p><strong>The total amount base on the start time to the end time, the total amount based on the booking's duration</strong></p>
+                <p id="rate-description"><strong>The total amount based on the start time to the end time, the total amount based on the booking's duration</strong></p>
             </div>
 
             <button type="submit" class="confirm-btn">
@@ -124,7 +138,6 @@
     </form>
 </div>
 
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Set minimum datetime to current time
@@ -134,6 +147,10 @@
         
         const startInput = document.getElementById('start_time');
         const endInput = document.getElementById('end_time');
+        const openTimeCheckbox = document.getElementById('open_time_checkbox');
+        const endTimeGroup = document.getElementById('end-time-group');
+        const displayAmount = document.getElementById('display-amount');
+        const rateDescription = document.getElementById('rate-description');
         
         startInput.min = currentDateTime;
         endInput.min = currentDateTime;
@@ -150,17 +167,51 @@
             }
         });
 
+        // Handle Open Time checkbox
+        openTimeCheckbox.addEventListener('change', function() {
+            if(this.checked) {
+                // Disable end time input
+                endInput.disabled = true;
+                endInput.required = false;
+                endInput.value = '';
+                endTimeGroup.style.opacity = '0.5';
+                endTimeGroup.style.pointerEvents = 'none';
+                
+                // Update display
+                displayAmount.textContent = 'TBD';
+                displayAmount.style.color = '#ff9800';
+                rateDescription.innerHTML = '<strong>⏰ Open Time selected. The total amount will be calculated based on actual parking duration when you check out.</strong>';
+                rateDescription.style.background = '#fff3e0';
+                rateDescription.style.borderLeft = '4px solid #ff9800';
+            } else {
+                // Enable end time input
+                endInput.disabled = false;
+                endInput.required = true;
+                endTimeGroup.style.opacity = '1';
+                endTimeGroup.style.pointerEvents = 'auto';
+                
+                // Reset display
+                displayAmount.textContent = '₱50.00';
+                displayAmount.style.color = '#2e7d32';
+                rateDescription.innerHTML = '<strong>The total amount based on the start time to the end time, the total amount based on the booking\'s duration</strong>';
+                rateDescription.style.background = '#fff3cd';
+                rateDescription.style.borderLeft = '4px solid #ffc107';
+            }
+        });
+
         // When start time changes, update end time minimum
         startInput.addEventListener('change', function() {
-            endInput.min = this.value;
-            if(endInput.value && endInput.value <= this.value) {
-                endInput.value = '';
+            if(!openTimeCheckbox.checked) {
+                endInput.min = this.value;
+                if(endInput.value && endInput.value <= this.value) {
+                    endInput.value = '';
+                }
             }
         });
 
         // Validate end time is after start time
         endInput.addEventListener('change', function() {
-            if(startInput.value && this.value <= startInput.value) {
+            if(!openTimeCheckbox.checked && startInput.value && this.value <= startInput.value) {
                 alert('End time must be after start time');
                 this.value = '';
             }
@@ -172,6 +223,7 @@
             const vehicleId = document.getElementById('vehicle_id').value;
             const startTime = document.getElementById('start_time').value;
             const endTime = document.getElementById('end_time').value;
+            const isOpenTime = openTimeCheckbox.checked;
 
             if(!vehicleId) {
                 e.preventDefault();
@@ -179,13 +231,19 @@
                 return false;
             }
 
-            if(!startTime || !endTime) {
+            if(!startTime) {
                 e.preventDefault();
-                alert('Please select start and end time');
+                alert('Please select start time');
                 return false;
             }
 
-            if(endTime <= startTime) {
+            if(!isOpenTime && !endTime) {
+                e.preventDefault();
+                alert('Please select end time or check "Open Time"');
+                return false;
+            }
+
+            if(!isOpenTime && endTime <= startTime) {
                 e.preventDefault();
                 alert('End time must be after start time');
                 return false;

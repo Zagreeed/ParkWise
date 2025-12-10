@@ -154,7 +154,7 @@ class AdminController extends BaseController{
         $this->renderView("admin", "UserDetailsPage", $datas, "userPages");
     }
 
-   public function updateBookingStatus(){
+    public function updateBookingStatus(){
         if($_SERVER["REQUEST_METHOD"] != "POST"){
             $this->renderView("error", "errorPage");
             exit();    
@@ -173,7 +173,11 @@ class AdminController extends BaseController{
             exit();    
         }
 
-       
+        // Check if this is an open-time booking
+        $endDateTime = new DateTime($booking['end_time']);
+        $isOpenTime = ($endDateTime->format('m-d H:i') === '12-31 23:59');
+
+        // Update booking status
         $datas = ["status" => $newStatus];
         $request = $this->bookingModel->update($id, $datas);
 
@@ -183,17 +187,35 @@ class AdminController extends BaseController{
         }
 
         
-        if($newStatus === "completed" && isset($booking['slot_id'])){
-            $slotData = ["status" => "available"];
-            $this->parkingSlotModel->update($booking['slot_id'], $slotData);
+        // Handle status changes based on new status
+        if($newStatus === "completed"){
+            // For open-time bookings that are being manually completed
+            if($isOpenTime){
+                // Don't allow manual completion to "completed" for open-time bookings
+                // They should use the "Complete & Calculate" button instead
+                $_SESSION["errors"] = "Open-time bookings must be completed using the 'Complete & Calculate' button to calculate the final amount.";
+                $this->getBookingsPage();
+                exit();
+            }
+            
+            // For normal bookings - set slot to available
+            if(isset($booking['slot_id'])){
+                $slotData = ["status" => "available"];
+                $this->parkingSlotModel->update($booking['slot_id'], $slotData);
+            }
         }
 
   
         if($newStatus === "active" && isset($booking['slot_id'])){
             $slotData = ["status" => "occupied"];
-            $paymentData = ["payment_status" => "paid"];
             $this->parkingSlotModel->update($booking['slot_id'], $slotData);
-            $this->paymentModel->update($paymentDetails["payment_id"], $paymentData);
+            
+            // Only update payment to "paid" for NON open-time bookings
+            if(!$isOpenTime && $paymentDetails && is_array($paymentDetails)){
+                $paymentData = ["payment_status" => "paid"];
+                $this->paymentModel->update($paymentDetails["payment_id"], $paymentData);
+            }
+            // For open-time bookings, payment remains "pending"
         }
 
         
@@ -202,11 +224,10 @@ class AdminController extends BaseController{
             $this->parkingSlotModel->update($booking['slot_id'], $slotData);
         }
 
+        $_SESSION["success"] = "Booking status updated successfully";
         $this->getBookingsPage();
         exit();
     }
-
-
 
     public function updateSlotStatus(){
         if($_SERVER["REQUEST_METHOD"] != "POST"){
@@ -272,6 +293,135 @@ class AdminController extends BaseController{
         $this->getParkingSlotsPage();
         exit();
     }
+
+
+    public function completeOpenTimeBooking(){
+    if($_SERVER["REQUEST_METHOD"] != "POST"){
+        $this->renderView("error", "errorPage");
+        exit();    
+    }
+
+    $bookingId = htmlspecialchars(strip_tags(trim($_POST['booking_id'] ?? '')), ENT_QUOTES, 'UTF-8');
+    
+    // Debug log
+    error_log("CompleteOpenTimeBooking called with booking_id: " . $bookingId);
+    
+    if(empty($bookingId)){
+        $_SESSION["errors"] = "Invalid booking ID - No ID provided";
+        $this->getBookingsPage();
+        exit();    
+    }
+    
+    // Get booking
+    $booking = $this->bookingModel->find($bookingId);
+    error_log("Booking found: " . ($booking ? "YES" : "NO"));
+    
+    if(!$booking){
+        $_SESSION["errors"] = "Booking not found with ID: " . $bookingId;
+        $this->getBookingsPage();
+        exit();    
+    }
+    
+    // Get payment
+    $paymentDetails = $this->paymentModel->getPaymentByBookingId($bookingId);
+    error_log("Payment found: " . ($paymentDetails ? "YES" : "NO"));
+    
+    if(!$paymentDetails || !is_array($paymentDetails)){
+        $_SESSION["errors"] = "Payment record not found for booking ID: " . $bookingId;
+        $this->getBookingsPage();
+        exit();    
+    }
+
+    // Detect open-time booking (Dec 31 23:59)
+    $endDateTime = new DateTime($booking['end_time']);
+    $isOpenTime = ($endDateTime->format('m-d H:i') === '12-31 23:59');
+    
+    error_log("Is open time: " . ($isOpenTime ? "YES" : "NO") . " - End time: " . $booking['end_time']);
+    
+    if(!$isOpenTime){
+        $_SESSION["errors"] = "This is not an open-time booking. End time: " . $booking['end_time'];
+        $this->getBookingsPage();
+        exit();
+    }
+    
+    // Must be active
+    if($booking['status'] !== 'active'){
+        $_SESSION["errors"] = "Booking must be in 'active' status to complete. Current status: " . $booking['status'];
+        $this->getBookingsPage();
+        exit();
+    }
+
+    // =============================
+    //   NEW LOGIC: MINIMUM 1 HOUR
+    // =============================
+
+    $now = new DateTime(); // Actual end time (current time)
+    $start = new DateTime($booking['start_time']);
+
+    // Calculate raw hours
+    $interval = $start->diff($now);
+    $rawHours = $interval->h + ($interval->days * 24) + ($interval->i / 60);
+
+    // If parked less than 1 hour → Force end time = now + 1 hour
+    if ($rawHours < 1) {
+        $now->modify('+1 hour');
+    }
+
+    // Final actual end time
+    $actualEndTime = $now->format('Y-m-d H:i:s');
+
+    // Recalculate actual duration
+    $end = new DateTime($actualEndTime);
+    $interval = $start->diff($end);
+    $actualHours = $interval->h + ($interval->days * 24);
+
+    // Always round up to nearest hour with a minimum of 1 hour
+    $actualHours = max(1, ceil($actualHours));
+
+    // ₱50 per hour
+    $totalAmount = $actualHours * 50;
+
+    error_log("Calculated hours: " . $actualHours . ", Total amount: " . $totalAmount);
+
+    // Update booking
+    $bookingUpdate = [
+        "end_time" => $actualEndTime,
+        "status" => "completed"
+    ];
+    
+    $updateResult = $this->bookingModel->update($bookingId, $bookingUpdate);
+    
+    if(!$updateResult){
+        $_SESSION["errors"] = "Failed to update booking. Please try again.";
+        $this->getBookingsPage();
+        exit();    
+    }
+    
+    // Update payment
+    $paymentUpdate = [
+        "amount" => $totalAmount,
+        "payment_status" => "paid"
+    ];
+    
+    $paymentUpdateResult = $this->paymentModel->update($paymentDetails["payment_id"], $paymentUpdate);
+    
+    if(!$paymentUpdateResult){
+        $_SESSION["errors"] = "Booking updated but failed to update payment. Please check manually.";
+        $this->getBookingsPage();
+        exit();    
+    }
+    
+    // Set slot available
+    $slotUpdateResult = $this->parkingSlotModel->update($booking['slot_id'], ["status" => "available"]);
+    
+    if(!$slotUpdateResult){
+        error_log("Failed to update slot status for slot_id: " . $booking['slot_id']);
+    }
+    
+    $_SESSION["success"] = "Open-time booking completed. Duration: {$actualHours} hour(s), Amount: ₱" . number_format($totalAmount, 2);
+    $this->getBookingsPage();
+    exit();
+}
 
 
 

@@ -29,7 +29,7 @@ function call($controller, $action){
 $routes = [
     "HomeController" => ["homePage"],
     "UserController" => ["showLoginPage", "showEditVehiclePage", "updateVehicle", "deleteVehicle", "login", "signUp", "logout", "showDashBoard", "showSignUpPage", "signUp", "showAddVehichelPage", "addVehicle", "showMyVehiclePage", "showBookingsPage", "showActivityHistoryPage", "showProfilePage", "updateProfile", "showBookingDetailsPage", "showPaymentPage", "processPayment"],
-    "AdminController" => ["getDashBoardData", "updateSlotStatus", "Adminlogin", "showAdminLoginPage", "getParkingSlotsPage", "getBookingsPage", "getPaymentsPage",  "getUserContactPage", "updateBookingStatus"],
+    "AdminController" => ["getDashBoardData", "updateSlotStatus", "Adminlogin", "showAdminLoginPage", "getParkingSlotsPage", "getBookingsPage", "getPaymentsPage",  "getUserContactPage", "updateBookingStatus", "completeOpenTimeBooking"],
 ];
 
 

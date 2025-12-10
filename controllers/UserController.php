@@ -527,20 +527,36 @@ class UserController extends BaseController{
         $vehicleId = htmlspecialchars(strip_tags(trim($_POST['vehicle_id'] ?? '')), ENT_QUOTES, 'UTF-8');
         $startTime = htmlspecialchars(strip_tags(trim($_POST['start_time'] ?? '')), ENT_QUOTES, 'UTF-8');
         $endTime = htmlspecialchars(strip_tags(trim($_POST['end_time'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $isOpenTime = isset($_POST['open_time']) && $_POST['open_time'] == '1';
 
         // Validate inputs
-        if(empty($slotId) || empty($vehicleId) || empty($startTime) || empty($endTime)){
-            $_SESSION["errors"] = "All fields are required";
+        if(empty($slotId) || empty($vehicleId) || empty($startTime)){
+            $_SESSION["errors"] = "Required fields are missing";
             header("Location: ?controller=UserController&action=showBookingDetailsPage&slot_id=" . $slotId);
             exit();
         }
 
-        // Calculate duration and amount
-        $start = new DateTime($startTime);
-        $end = new DateTime($endTime);
-        $interval = $start->diff($end);
-        $hours = $interval->h + ($interval->days * 24);
-        $amount = $hours * 50; // ₱50 per hour
+        // If not open time, validate end time
+        if(!$isOpenTime && empty($endTime)){
+            $_SESSION["errors"] = "End time is required if not using Open Time";
+            header("Location: ?controller=UserController&action=showBookingDetailsPage&slot_id=" . $slotId);
+            exit();
+        }
+
+        // For open time bookings, set end_time to Dec 31 of current year
+        if($isOpenTime){
+            $currentYear = date('Y');
+            $endTime = $currentYear . '-12-31 23:59:59';
+            $amount = 50; // Placeholder amount (minimum value to satisfy DB constraint)
+            $hours = 0;
+        } else {
+            // Calculate duration and amount for normal bookings
+            $start = new DateTime($startTime);
+            $end = new DateTime($endTime);
+            $interval = $start->diff($end);
+            $hours = $interval->h + ($interval->days * 24);
+            $amount = $hours * 50; // ₱50 per hour
+        }
 
         // Fetch details for display
         $slotDetails = $this->parkingSlotModel->find($slotId);
@@ -555,7 +571,8 @@ class UserController extends BaseController{
             "start_time" => $startTime,
             "end_time" => $endTime,
             "booking_time" => date('Y-m-d H:i:s'),
-            "amount" => $amount
+            "amount" => $amount,
+            "is_open_time" => $isOpenTime
         ];
 
         $datas = [
@@ -564,13 +581,12 @@ class UserController extends BaseController{
             "vehicleDetails" => $vehicleDetails,
             "userData" => $userData,
             "amount" => $amount,
-            "hours" => $hours
+            "hours" => $hours,
+            "is_open_time" => $isOpenTime
         ];
 
         $this->renderView("user", "paymentPage", $datas, "paymentPage");
     }
-
-
    
     public function processPayment(){
         if(!isset($_SESSION["userId"]) || !isset($_SESSION["pending_booking"])){
@@ -592,9 +608,14 @@ class UserController extends BaseController{
         }
 
         $bookingData = $_SESSION["pending_booking"];
+        $isOpenTime = isset($bookingData['is_open_time']) && $bookingData['is_open_time'];
 
         // Create booking with status 'pending'
         $bookingData['status'] = 'pending';
+        
+        // Remove is_open_time flag before inserting into database
+        unset($bookingData['is_open_time']);
+        
         $bookingId = $this->bookingModel->create($bookingData);
 
         if(!$bookingId){
@@ -607,11 +628,18 @@ class UserController extends BaseController{
         $this->parkingSlotModel->update($bookingData['slot_id'], ["status" => "reserved"]);
 
         // Create payment record
+        // For open time bookings, payment status is ALWAYS 'pending' regardless of payment method
+        // For normal bookings, cash = 'pending', others = 'paid'
+        $paymentStatus = 'pending';
+        if(!$isOpenTime && $paymentMethod !== "cash"){
+            $paymentStatus = 'paid';
+        }
+
         $paymentData = [
             "booking_id" => $bookingId,
             "amount" => $bookingData['amount'],
             "payment_method" => $paymentMethod,
-            "payment_status" => ($paymentMethod === "cash") ? "pending" : "paid"
+            "payment_status" => $paymentStatus
         ];
 
         $paymentId = $this->paymentModel->create($paymentData);
@@ -622,22 +650,19 @@ class UserController extends BaseController{
             exit();
         }
 
-      
-        if($paymentMethod !== "cash"){
-            $this->bookingModel->update($bookingId, ["status" => "pending"]);
-            $this->parkingSlotModel->update($bookingData['slot_id'], ["status" => "reserved"]);
-        }
-
         // Clear pending booking from session
         unset($_SESSION["pending_booking"]);
 
         // Set success message
-        $_SESSION["success"] = "Booking created successfully!";
+        if($isOpenTime){
+            $_SESSION["success"] = "Open Time booking created successfully! Payment will be processed when you check out.";
+        } else {
+            $_SESSION["success"] = "Booking created successfully!";
+        }
 
         // Redirect to activity history
         $this->showActivityHistoryPage();
     }
-
 
 
 
