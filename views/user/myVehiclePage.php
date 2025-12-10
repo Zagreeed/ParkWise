@@ -8,6 +8,8 @@
     </div>
 
     <div class="card">
+
+        <!-- SUCCESS MESSAGE -->
         <?php if(isset($_SESSION["success"])): ?>
             <div class="success-message" style="background: #e8f5e9; color: #2e7d32; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
                 <p style="margin: 0;">✓ <?= htmlspecialchars($_SESSION["success"]) ?></p>
@@ -15,6 +17,7 @@
             <?php unset($_SESSION["success"]); ?>
         <?php endif; ?>
 
+        <!-- ERROR MESSAGE (Only ONE block — FIXED) -->
         <?php if(isset($_SESSION["errors"])): ?>
             <div class="error-message" style="background: #ffebee; color: #c62828; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
                 <?php 
@@ -91,6 +94,20 @@
             document.getElementById('deleteVehicleForm').submit();
         }
     }
+
+     setTimeout(() => {
+        const successMsg = document.querySelector('.success-message');
+        const errorMsg = document.querySelector('.error-message');
+
+        [successMsg, errorMsg].forEach(msg => {
+            if(msg){
+                msg.style.transition = 'opacity 1s ease';
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 1000);
+            }
+        });
+    }, 3000);
+    
 </script>
 
 <style>
@@ -118,4 +135,6 @@
     .btn-edit i, .btn-delete i {
         font-size: 0.9rem;
     }
+
+    
 </style>

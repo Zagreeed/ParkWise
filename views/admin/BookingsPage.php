@@ -2,18 +2,12 @@
     <h1>Bookings</h1>
     <p class="section-subtitle">View and manage all parking bookings.</p>
 
+    <!-- SUCCESS MESSAGE ONLY -->
     <?php if(isset($_SESSION["success"])): ?>
         <div class="success-message" style="background: #e8f5e9; color: #2e7d32; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; animation: slideDown 0.3s ease;">
             <p style="margin: 0;">✓ <?= htmlspecialchars($_SESSION["success"]) ?></p>
         </div>
         <?php unset($_SESSION["success"]); ?>
-    <?php endif; ?>
-
-    <?php if(isset($_SESSION["errors"])): ?>
-        <div class="error-message" style="background: #ffebee; color: #c62828; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; animation: slideDown 0.3s ease;">
-            <p style="margin: 0;">⚠ <?= htmlspecialchars($_SESSION["errors"]) ?></p>
-        </div>
-        <?php unset($_SESSION["errors"]); ?>
     <?php endif; ?>
 
     <div class="table-wrapper">
@@ -34,7 +28,6 @@
           <?php if(isset($content) && is_array($content) && count($content) > 0): ?>
             <?php foreach($content as $booking): ?>
               <?php 
-                // Check if this is an open-time booking
                 $endDateTime = new DateTime($booking['end_time']);
                 $isOpenTime = ($endDateTime->format('m-d H:i') === '12-31 23:59');
               ?>
@@ -56,7 +49,7 @@
                 <td>
                   <form class="updateForm" action="?controller=AdminController&action=updateBookingStatus" method="post">
                     <input type="hidden" name="booking_id" value="<?= $booking['booking_id']?>">
-                    <select name="status" onchange="this.form.submit()" class="status <?= $booking['status']?>" class="status-dropdown">
+                    <select name="status" onchange="this.form.submit()" class="status <?= $booking['status']?>">
                       <option class="status active" value="active" <?= $booking['status'] == "active" ? "selected" : "" ?>>Active</option>
                       <option class="status completed" value="completed" <?= $booking['status'] == "completed" ? "selected" : "" ?>>Completed</option>
                       <option class="status pending" value="pending" <?= $booking['status'] == "pending" ? "selected" : "" ?>>Pending</option>
@@ -68,7 +61,7 @@
                     <form action="?controller=AdminController&action=completeOpenTimeBooking" method="post" style="display: inline;">
                       <input type="hidden" name="booking_id" value="<?= $booking['booking_id']?>">
                       <button type="submit" 
-                              class="btn-complete-open-time" 
+                              class="btn-complete-open-time"
                               onclick="return confirm('Complete this open-time booking? This will calculate the total amount based on actual parking duration.');"
                               style="background: linear-gradient(135deg, #66bb6a, #43a047); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease;">
                         <i class="fa-solid fa-check-circle"></i> Complete & Calculate
@@ -103,7 +96,6 @@
       });
     }
 
-    // Add hover effect to complete buttons
     document.querySelectorAll('.btn-complete-open-time').forEach(btn => {
       btn.addEventListener('mouseenter', function() {
         this.style.transform = 'translateY(-2px)';
@@ -117,21 +109,13 @@
     });
   });
 
-  // Auto-hide messages after 5 seconds
+  // AUTO-HIDE SUCCESS MESSAGE ONLY
   setTimeout(() => {
     const successMsg = document.querySelector('.success-message');
-    const errorMsg = document.querySelector('.error-message');
-    
     if(successMsg) {
       successMsg.style.transition = 'opacity 0.5s ease';
       successMsg.style.opacity = '0';
       setTimeout(() => successMsg.remove(), 500);
-    }
-    
-    if(errorMsg) {
-      errorMsg.style.transition = 'opacity 0.5s ease';
-      errorMsg.style.opacity = '0';
-      setTimeout(() => errorMsg.remove(), 500);
     }
   }, 5000);
 </script>

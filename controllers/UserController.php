@@ -290,18 +290,19 @@ class UserController extends BaseController{
 
         if(!empty($errors)){
             $_SESSION["errors"] = $errors;
-            $this->showAddVehichelPage();
+            $this->showMyVehiclePage();
             exit();
         }
 
         $data = $this->vehicleModel->create($datas);
 
         if(!$data){
-            $_SESSION["errors"] = "Something very bad haappen while adding a vehicle! check the 'addVehicle' controller -ps dev GALAN";
-            $this->showAddVehichelPage();
+            $_SESSION["errors"] = "Plate number already exist!";
+            $this->showMyVehiclePage();
             exit();    
         };
 
+        $_SESSION["success"] = "Vehicle Added Successfully";
         $this->showMyVehiclePage();
         exit();
 
