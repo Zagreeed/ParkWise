@@ -289,77 +289,90 @@ class AdminController extends BaseController{
 
 
     public function completeOpenTimeBooking(){
-    if($_SERVER["REQUEST_METHOD"] != "POST"){
-        $this->renderView("error", "errorPage");
-        exit();    
-    }
+        if($_SERVER["REQUEST_METHOD"] != "POST"){
+            $this->renderView("error", "errorPage");
+            exit();    
+        }
 
-    $bookingId = htmlspecialchars(strip_tags(trim($_POST['booking_id'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $bookingId = htmlspecialchars(strip_tags(trim($_POST['booking_id'] ?? '')), ENT_QUOTES, 'UTF-8');
 
-    if(empty($bookingId)){
-        $_SESSION["errors"] = "Invalid booking ID";
+        if(empty($bookingId)){
+            $_SESSION["errors"] = "Invalid booking ID";
+            $this->getBookingsPage();
+            exit();
+        }
+
+        // Get booking
+        $booking = $this->bookingModel->find($bookingId);
+
+        if(!$booking){
+            $_SESSION["errors"] = "Booking not found";
+            $this->getBookingsPage();
+            exit();
+        }
+
+        // Ensure slot exists
+        if(!isset($booking['slot_id'])){
+            $_SESSION["errors"] = "Invalid booking slot";
+            $this->getBookingsPage();
+            exit();
+        }
+
+        // Get payment
+        $paymentDetails = $this->paymentModel->getPaymentByBookingId($bookingId);
+
+        if(!$paymentDetails){
+            $_SESSION["errors"] = "Payment record not found";
+            $this->getBookingsPage();
+            exit();
+        }
+
+        // ==================================
+        //  Calculate actual end time and amount
+        // ==================================
+        
+        // Get current time as the actual end time
+        $actualEndTime = new DateTime();
+        $actualEndTimeStr = $actualEndTime->format('Y-m-d H:i:s');
+        
+        // Calculate actual duration using timestamps for accurate total hours
+        $startDateTime = new DateTime($booking['start_time']);
+        $startTimestamp = $startDateTime->getTimestamp();
+        $endTimestamp = $actualEndTime->getTimestamp();
+        
+        // Calculate total hours (including fractional hours)
+        $totalSeconds = $endTimestamp - $startTimestamp;
+        $totalHours = ceil($totalSeconds / 3600); // Round up to nearest hour
+        
+        // Minimum 1 hour charge
+        if($totalHours < 1){
+            $totalHours = 1;
+        }
+        
+        // Calculate total amount (₱50 per hour)
+        $totalAmount = $totalHours * 50;
+
+        // Update booking with actual end time and completed status
+        $this->bookingModel->update($booking["booking_id"], [
+            "end_time" => $actualEndTimeStr,
+            "status" => "completed"
+        ]);
+
+        // Update payment with calculated amount
+        $this->paymentModel->update($paymentDetails["payment_id"], [
+            "amount" => $totalAmount,
+            "payment_status" => "paid"
+        ]);
+
+        // Update parking slot to available
+        $this->parkingSlotModel->update($booking['slot_id'], [
+            "status" => "available"
+        ]);
+
+        $_SESSION["success"] = "Open-time booking completed. Duration: {$totalHours} hour(s). Amount: ₱" . number_format($totalAmount, 2);
         $this->getBookingsPage();
         exit();
     }
-
-    // Get booking
-    $booking = $this->bookingModel->find($bookingId);
-
-    if(!$booking){
-        $_SESSION["errors"] = "Booking not found";
-        $this->getBookingsPage();
-        exit();
-    }
-
-    // Ensure slot exists
-    if(!isset($booking['slot_id'])){
-        $_SESSION["errors"] = "Invalid booking slot";
-        $this->getBookingsPage();
-        exit();
-    }
-
-    // Get payment
-    $paymentDetails = $this->paymentModel->getPaymentByBookingId($bookingId);
-
-    if(!$paymentDetails){
-        $_SESSION["errors"] = "Payment record not found";
-        $this->getBookingsPage();
-        exit();
-    }
-
-    // ==================================
-    //  SUPER SIMPLE LOGIC
-    // ==================================
-
-    // End time = start_time + 1 hour
-    $start = new DateTime($booking['start_time']);
-    $start->modify('+1 hour');
-    $endTime = $start->format('Y-m-d H:i:s');
-
-    // Always charge ₱50
-    $totalAmount = 50;
-
-    // Update booking
-    $this->bookingModel->update($booking["booking_id"], [
-        "end_time" => $endTime,
-        "status" => "completed"
-    ]);
-
-    // Update payment
-    $this->paymentModel->update($paymentDetails["payment_id"], [
-        "amount" => $totalAmount,
-        "payment_status" => "paid"
-    ]);
-
-    // Update parking slot
-    $this->parkingSlotModel->update($booking['slot_id'], [
-        "status" => "available"
-    ]);
-
-    $_SESSION["success"] = "Open-time booking completed. Amount to pay: ₱50";
-    $this->getBookingsPage();
-    exit();
-}
 
 
 }

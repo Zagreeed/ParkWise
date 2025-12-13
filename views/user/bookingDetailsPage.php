@@ -6,6 +6,7 @@
         </div>
     </div>
 
+
     <form method="POST" action="?controller=UserController&action=showPaymentPage" class="booking-details-wrapper">
         
         <div class="card booking-info-card">
@@ -98,10 +99,11 @@
             </div>
 
             <!-- Open Time Checkbox -->
+           
             <div class="form-group" style="margin-top: 1rem;">
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                     <input type="checkbox" id="open_time_checkbox" name="open_time" value="1" 
-                           style="width: 18px; height: 18px; cursor: pointer; accent-color: #66bb6a;">
+                        style="width: 18px; height: 18px; cursor: pointer; accent-color: #66bb6a;">
                     <span style="font-weight: 600; color: #1b5e20;">
                         <i class="fa-solid fa-infinity"></i>
                         Open Time (Uncertain end time)

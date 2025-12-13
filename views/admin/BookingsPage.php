@@ -2,6 +2,7 @@
     <h1>Bookings</h1>
     <p class="section-subtitle">View and manage all parking bookings.</p>
 
+  
     <!-- SUCCESS MESSAGE ONLY -->
     <?php if(isset($_SESSION["success"])): ?>
         <div class="success-message" style="background: #e8f5e9; color: #2e7d32; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; animation: slideDown 0.3s ease;">
@@ -29,7 +30,15 @@
             <?php foreach($content as $booking): ?>
               <?php 
                 $endDateTime = new DateTime($booking['end_time']);
-                $isOpenTime = ($endDateTime->format('m-d H:i') === '12-31 23:59');
+                $startDateTime = new DateTime($booking['start_time']);
+                
+                // Check if this is an open time booking by comparing start + 1 hour with end time
+                $startPlusOneHour = clone $startDateTime;
+                $startPlusOneHour->modify('+1 hour');
+                
+                // It's open time if end_time equals start_time + 1 hour AND status is not completed
+                $isOpenTime = ($endDateTime->format('Y-m-d H:i:s') === $startPlusOneHour->format('Y-m-d H:i:s')) 
+                              && $booking['status'] !== 'completed';
               ?>
               <tr>
                 <td><?= htmlspecialchars($booking['booking_id'] ?? '') ?></td>

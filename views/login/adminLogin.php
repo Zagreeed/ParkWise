@@ -207,6 +207,21 @@
 <body class="login-body">
 
 <div class="login-container">
+
+    <?php if(isset($_SESSION["success"])): ?>
+        <div class="success-message" style="background: #e8f5e9; color: #2e7d32; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; animation: slideDown 0.3s ease;">
+            <p style="margin: 0;">✓ <?= htmlspecialchars($_SESSION["success"]) ?></p>
+        </div>
+        <?php unset($_SESSION["success"]); ?>
+    <?php endif; ?>
+
+    <?php if(isset($_SESSION["errors"])): ?>
+        <div class="error-message" style="background: #ffebee; color: #c62828; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; animation: slideDown 0.3s ease;">
+            <p style="margin: 0;">⚠ <?= htmlspecialchars($_SESSION["errors"]) ?></p>
+        </div>
+        <?php unset($_SESSION["errors"]); ?>
+    <?php endif; ?>
+
  
     <img src="<?php echo BASE_URL?>views/static/Images/logo1.png" class="login-logo1" alt="Parkwise Logo">
     <h2>ParkWise Admin</h2>
@@ -241,5 +256,24 @@
     
 
 <script src="script.js"></script>
+<script>
+    setTimeout(() => {
+    const successMsg = document.querySelector('.success-message');
+    const errorMsg = document.querySelector('.error-message');
+    
+    if(successMsg) {
+      successMsg.style.transition = 'opacity 0.5s ease';
+      successMsg.style.opacity = '0';
+      setTimeout(() => successMsg.remove(), 500);
+    }
+    
+    if(errorMsg) {
+      errorMsg.style.transition = 'opacity 0.5s ease';
+      errorMsg.style.opacity = '0';
+      setTimeout(() => errorMsg.remove(), 500);
+    }
+  }, 5000);
+</script>
 </body>
 </html>
+

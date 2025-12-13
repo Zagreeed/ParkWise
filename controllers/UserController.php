@@ -526,30 +526,56 @@ class UserController extends BaseController{
         // Get form data
         $slotId = htmlspecialchars(strip_tags(trim($_POST['slot_id'] ?? '')), ENT_QUOTES, 'UTF-8');
         $vehicleId = htmlspecialchars(strip_tags(trim($_POST['vehicle_id'] ?? '')), ENT_QUOTES, 'UTF-8');
-        $startTime = htmlspecialchars(strip_tags(trim($_POST['start_time'] ?? '')), ENT_QUOTES, 'UTF-8');
-        $endTime = htmlspecialchars(strip_tags(trim($_POST['end_time'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $startTimeRaw = htmlspecialchars(strip_tags(trim($_POST['start_time'] ?? '')), ENT_QUOTES, 'UTF-8');
+        $endTimeRaw = htmlspecialchars(strip_tags(trim($_POST['end_time'] ?? '')), ENT_QUOTES, 'UTF-8');
+        
+        // ============================================================
+        // CRITICAL FIX: Convert HTML5 datetime format to SQLite format
+        // HTML5: 2024-12-12T22:13
+        // SQLite: 2024-12-12 22:13:00
+        // ============================================================
+        $startTime = '';
+        if(!empty($startTimeRaw)){
+            $startDateTime = new DateTime($startTimeRaw);
+            $startTime = $startDateTime->format('Y-m-d H:i:s');
+        }
+        
+        $endTime = '';
+        if(!empty($endTimeRaw)){
+            $endDateTime = new DateTime($endTimeRaw);
+            $endTime = $endDateTime->format('Y-m-d H:i:s');
+        }
+        
+        // Check if open time is selected
         $isOpenTime = isset($_POST['open_time']) && $_POST['open_time'] == '1';
 
-        // Validate inputs
+        // Validate basic required inputs
         if(empty($slotId) || empty($vehicleId) || empty($startTime)){
             $_SESSION["errors"] = "Required fields are missing";
-            header("Location: ?controller=UserController&action=showBookingDetailsPage&slot_id=" . $slotId);
+            $this->showBookingsPage();
             exit();
         }
 
-        // If not open time, validate end time
+        // Only validate end time if NOT open time
         if(!$isOpenTime && empty($endTime)){
             $_SESSION["errors"] = "End time is required if not using Open Time";
-            header("Location: ?controller=UserController&action=showBookingDetailsPage&slot_id=" . $slotId);
+            $this->showBookingsPage();
             exit();
         }
 
-        // For open time bookings, set end_time to Dec 31 of current year
+        // For open time bookings, set end_time to start_time + 1 hour
         if($isOpenTime){
-            $currentYear = date('Y');
-            $endTime = $currentYear . '-12-31 23:59:59';
-            $amount = 50; // Placeholder amount (minimum value to satisfy DB constraint)
-            $hours = 0;
+            // start_time is already in Y-m-d H:i:s format
+            $startDateTime = new DateTime($startTime);
+            
+            // Clone and add 1 hour
+            $endDateTime = clone $startDateTime;
+            $endDateTime->modify('+1 hour');
+            $endTime = $endDateTime->format('Y-m-d H:i:s');
+
+            // Set defaults for open time
+            $hours = 1;
+            $amount = 50; // ₱50 per hour
         } else {
             // Calculate duration and amount for normal bookings
             $start = new DateTime($startTime);
@@ -588,21 +614,33 @@ class UserController extends BaseController{
 
         $this->renderView("user", "paymentPage", $datas, "paymentPage");
     }
-   
+
+
     public function processPayment(){
+        error_log("=== processPayment DEBUG START ===");
+        error_log("Session userId: " . (isset($_SESSION["userId"]) ? $_SESSION["userId"] : 'NOT SET'));
+        error_log("Session pending_booking: " . (isset($_SESSION["pending_booking"]) ? 'SET' : 'NOT SET'));
+        
         if(!isset($_SESSION["userId"]) || !isset($_SESSION["pending_booking"])){
+            error_log("VALIDATION FAILED: Missing session data");
+            error_log("=== processPayment DEBUG END ===");
             $this->showLoginPage();
             exit();
         }
 
         if($_SERVER["REQUEST_METHOD"] != "POST"){
+            error_log("VALIDATION FAILED: Not POST request");
+            error_log("=== processPayment DEBUG END ===");
             $this->showBookingsPage();
             exit();
         }
 
         $paymentMethod = htmlspecialchars(strip_tags(trim($_POST['payment_method'] ?? '')), ENT_QUOTES, 'UTF-8');
+        error_log("Payment method: '" . $paymentMethod . "'");
 
         if(empty($paymentMethod)){
+            error_log("VALIDATION FAILED: No payment method");
+            error_log("=== processPayment DEBUG END ===");
             $_SESSION["errors"] = "Please select a payment method";
             $this->showPaymentPage();
             exit();
@@ -611,22 +649,37 @@ class UserController extends BaseController{
         $bookingData = $_SESSION["pending_booking"];
         $isOpenTime = isset($bookingData['is_open_time']) && $bookingData['is_open_time'];
 
+        error_log("Booking data from session:");
+        error_log(print_r($bookingData, true));
+        error_log("Is open time: " . ($isOpenTime ? 'YES' : 'NO'));
+
         // Create booking with status 'pending'
         $bookingData['status'] = 'pending';
         
         // Remove is_open_time flag before inserting into database
         unset($bookingData['is_open_time']);
         
+        error_log("Data to be inserted into Bookings table:");
+        error_log(print_r($bookingData, true));
+        error_log("  start_time: " . $bookingData['start_time']);
+        error_log("  end_time: " . $bookingData['end_time']);
+        error_log("  Comparison: " . ($bookingData['end_time'] > $bookingData['start_time'] ? 'VALID' : 'INVALID'));
+        
         $bookingId = $this->bookingModel->create($bookingData);
 
         if(!$bookingId){
+            error_log("ERROR: Failed to create booking");
+            error_log("=== processPayment DEBUG END ===");
             $_SESSION["errors"] = "Failed to create booking";
             $this->showPaymentPage();
             exit();
         }
 
+        error_log("Booking created successfully with ID: " . $bookingId);
+
         // Update slot status to 'reserved'
         $this->parkingSlotModel->update($bookingData['slot_id'], ["status" => "reserved"]);
+        error_log("Slot status updated to 'reserved'");
 
         // Create payment record
         // For open time bookings, payment status is ALWAYS 'pending' regardless of payment method
@@ -636,6 +689,8 @@ class UserController extends BaseController{
             $paymentStatus = 'paid';
         }
 
+        error_log("Payment status will be: " . $paymentStatus);
+
         $paymentData = [
             "booking_id" => $bookingId,
             "amount" => $bookingData['amount'],
@@ -643,13 +698,20 @@ class UserController extends BaseController{
             "payment_status" => $paymentStatus
         ];
 
+        error_log("Payment data:");
+        error_log(print_r($paymentData, true));
+
         $paymentId = $this->paymentModel->create($paymentData);
 
         if(!$paymentId){
+            error_log("ERROR: Failed to create payment");
+            error_log("=== processPayment DEBUG END ===");
             $_SESSION["errors"] = "Payment processing failed";
             $this->showPaymentPage();
             exit();
         }
+
+        error_log("Payment created successfully with ID: " . $paymentId);
 
         // Clear pending booking from session
         unset($_SESSION["pending_booking"]);
@@ -660,6 +722,9 @@ class UserController extends BaseController{
         } else {
             $_SESSION["success"] = "Booking created successfully!";
         }
+
+        error_log("Process completed successfully");
+        error_log("=== processPayment DEBUG END ===");
 
         // Redirect to activity history
         $this->showActivityHistoryPage();
